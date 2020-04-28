@@ -1,0 +1,27 @@
+.transparent-button {
+    background-color: Transparent;
+    background-repeat:no-repeat;
+    cursor:pointer;
+    overflow: hidden;
+    outline:none;
+    height:  40px;
+    width:  120px;
+    line-height:  40px;
+    border:  1px solid white;
+    display:  inline-block;
+    float:  none;
+    text-align:  center;
+
+    padding:  0px!important;
+    font-size:  14px;
+    color:  #fff;
+ }
+
+.transparent-button:hover  {
+     color:  #fff;
+     background:  rgba(255, 255, 255, 0.2);
+ }
+
+.input-field input[type=text]:focus + label {
+    color: #000;
+}

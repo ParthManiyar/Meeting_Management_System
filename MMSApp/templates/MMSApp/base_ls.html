@@ -1,0 +1,49 @@
+{% load static %}
+
+<html lang="en">
+<head>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+  <link rel="stylesheet" href="{% static '/MMSApp/css/signup&login.css' %}">
+
+</head>
+
+<body >
+
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
+  <!-- <nav>
+
+      <div class="row white center">
+
+        <span style="color:#003d72">  </span>
+
+      </div> -->
+
+  <!-- </nav> -->
+
+  <nav>
+    <div class="nav-wrapper white">
+      <a href="/home" class="brand-logo center" style="color:#003d72">AUMMS</a>
+      <ul id="nav-mobile" class="right hide-on-med-and-down">
+        <!-- <li><a href="sass.html">Sass</a></li>
+        <li><a href="badges.html">Components</a></li>
+        <li><a href="collapsible.html">JavaScript</a></li> -->
+      </ul>
+    </div>
+  </nav>
+
+    {% block content %}
+    {% endblock %}
+
+</body>
+</html>

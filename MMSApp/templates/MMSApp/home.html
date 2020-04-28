@@ -1,0 +1,164 @@
+{% extends 'MMSApp/base.html' %}
+{% block content %}
+{% load static %}
+
+<div class="row center">
+
+  <div class="col s4">
+
+    <br>
+
+    <a class="btn-floating btn-large waves-effect waves-light modal-trigger" style="background-color:#003d72" href="#group_modal" ><i class="material-icons">add</i></a>
+    <h4> Groups </h4>
+
+    <div id="group_modal" class="modal" >
+      <div class="modal-content" style="background-color:#003d72;color:white">
+        <h4>Create New Group</h4>
+        <br>
+        <p style="color:white"> Add people by searching </p>
+        <br>
+
+        <div class="row">
+           <div class="col s6 offset-s3">
+             <div class="row">
+               <div class="input-field col s11">
+                 <i class="material-icons prefix">search</i>
+                 <input type="text" id="search_user_for_group" class="autocomplete white-text">
+               </div>
+             </div>
+           </div>
+           <div class="col s1" style="padding-top:1em;">
+             <button class="transparent-button" id="add_user_btn_for_group">Add</button>
+          </div>
+        </div>
+
+      <br>
+
+      <div class="row" id="all_users_for_group">
+      </div>
+
+      </div>
+      <div class="modal-footer">
+        <a href="#!" class="modal-close waves-effect waves-green btn-flat">Create</a>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="col s4">
+
+    <br>
+
+    <a class="btn-floating btn-large waves-effect waves-light modal-trigger" style="background-color:#003d72" href="#meeting_modal" ><i class="material-icons">add</i></a>
+    <h4> Meetings </h4>
+
+    <div id="meeting_modal" class="modal" >
+      <div class="modal-content" style="background-color:#003d72;color:white;scroll:auto">
+        <h4>Call a Meet</h4>
+        <br>
+        <p> Select a group </p>
+        <br>
+
+        <div class="row">
+          <div class="input-field col s4 offset-s1">
+            <input placeholder="Name" id="meeting_name" type="text" style="color:white">
+            <label for="meeting_name">Name</label>
+          </div>
+          <div class="input-field col s4 offset-s2">
+            <input placeholder="Agenda" id="meeting_agenda" type="text" style="color:white">
+            <label for="meeting_agenda">Agenda</label>
+          </div>
+        </div>
+        <div class="row">
+          <div class="input-field col s4 offset-s1">
+            <input placeholder="Venue" id="meeting_venue" type="text" style="color:white">
+            <label for="meeting_venue">Venue</label>
+          </div>
+          <div class="input-field col s4 offset-s2">
+            <input class="datepicker" placeholder="Date" id="meeting_date" type="text" style="color:white">
+            <label for="meeting_date">Date</label>
+          </div>
+        </div>
+      <br>
+
+      <div class="row">
+        <div class="col s2 offset-s3">
+            <input placeholder="From" type="text" class="timepicker" id="meeting_from_time">
+        </div>
+        <div class="col s2 offset-s2">
+            <input placeholder="To" type="text" class="timepicker" id="meeting_to_time">
+        </div>
+      </div>
+
+      </div>
+      <div class="modal-footer">
+        <a href="#!" class="modal-close waves-effect waves-green btn-flat">Call</a>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="col s4">
+
+    <p> Schedule </p>
+
+  </div>
+
+</div>
+
+<script type="text/javascript">
+
+  $(document).ready(function(){
+
+    var typed_users = {};
+
+    user_dict = {"akash":null, "random":null};
+      console.log($("#search_user_for_group").length);
+      var instance = M.Autocomplete.getInstance($("#search_user_for_group"));
+      instance.updateData(user_dict);
+
+        function add_user(){
+
+           var user_input = $("#search_user_for_group").val();
+
+            if(user_input in user_dict){
+                if(user_input in typed_users){
+                   M.toast({html:"User already added"});
+                   return;
+                }
+                typed_users[user_input] = 1;
+                M.toast({html:"User successfully added"});
+                $("#search_user_for_group").val("");
+
+                var temp_html = '\  <div class="chip">\
+                    <img src="images/yuna.jpg" alt="Contact Person">\
+                    '+user_input+'\
+                    <i class="close material-icons remove_user">close</i>\
+                    </div>';
+                $("#all_users_for_group").append(temp_html);
+                instance.close();
+
+            }
+            else{
+               M.toast({html:"User doesn't exist"});
+            }
+        }
+
+        $("#add_user_btn_for_group").click(function(){
+          add_user();
+        })
+        $(document).on('keypress',function(e) {
+          if(e.which == 13) {
+              add_user();
+          }
+
+        $(".remove_user").click(function(){
+
+            var username = $(this).parent().text().replace("close","").trim();
+            delete typed_users[username];
+        })
+    });
+  });
+</script>
+
+{% endblock %}

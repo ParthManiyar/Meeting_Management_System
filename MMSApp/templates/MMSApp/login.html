@@ -1,0 +1,77 @@
+{% extends 'MMSApp/base_ls.html' %}
+{% block content %}
+{% load static %}
+
+  <div class="container center" style="width:40%;">
+      <br>
+      <br>
+      <br>
+
+
+      <span style="color:white;font-size:2em;">Login</span>
+      <br>
+      <br>
+
+
+      <div class="row" style="border-radius:3px;">
+        <div class="input-field col s10 offset-s1">
+          <i class="material-icons prefix"  style="color:white">account_circle</i>
+          <input autocomplete="off" placeholder="Username" type="text" id="username_login_id" style="color:white">
+        </div>
+
+        <div class="input-field col s10 offset-s1 ">
+          <i class="material-icons prefix" style="color:white">mode_edit</i>
+          <input autocomplete="off" placeholder="Password" type="password" id="password_login_id" style="color:white">
+        </div>
+      </div>
+
+      <button class="transparent-button" id="login_btn_id">Login</button>
+
+      <br>
+      <br>
+      <br>
+
+      <a href ="/signup" style="color:white;display:block;text-decoration: underline;"> Create New account? </a>
+      <br>
+
+    </div>
+
+
+  <script type="text/javascript">
+
+    $("body").css("background-color","#003d72");
+
+    $("#login_btn_id" ).click(function() {
+      login_submit()
+    });
+
+    function login_submit()
+    {
+      if($("#password_login_id").val() == "" || $("#username_login_id").val() == ""){
+
+        M.toast({html:"Every Input is Required"});
+        return;
+      }
+
+     $.ajax({
+          url: "/login_submit/",
+          type: "POST",
+          data: {
+            "username" : $("#username_login_id").val() ,
+            "password" : $("#password_login_id").val() ,
+          },
+          success: function(response) {
+            console.log(response);
+          },
+          error: function(xhr, a, b)
+          {
+            console.log("ERROR IN login_submit");
+          }
+        });
+        $("#password_login_id").val("")
+        $("#username_login_id").val("")
+    }
+
+  </script>
+
+{% endblock %}
