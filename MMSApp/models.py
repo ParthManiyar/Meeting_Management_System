@@ -120,6 +120,8 @@ class Meeting(models.Model):
     def __str__(self):
         return self.name
 
+    def get_time(self):
+        return self.start_time.strftime('%B %d %Y')
 #########
 
 class Group(models.Model):
@@ -133,6 +135,9 @@ class Group(models.Model):
 
     def __str__(self):
         return self.name
+
+    def get_created_date(self):
+        return self.created_date.strftime('%B %d %Y')
 
 #########
 

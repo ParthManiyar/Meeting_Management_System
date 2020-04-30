@@ -14,8 +14,9 @@ from django.http import HttpResponse, HttpResponseRedirect
 
 import json
 import uuid
-from django.core.files import File
+import datetime
 
+from django.core.files import File
 from io import BytesIO
 from PIL import Image as IMage
 from django.core.files.uploadedfile import InMemoryUploadedFile
@@ -237,3 +238,97 @@ class Get_User_GroupsAPI(APIView):
         return Response(data=response)
 
 Get_User_Groups = Get_User_GroupsAPI.as_view()
+
+
+class Get_Group_DetailsAPI(APIView):
+
+    authentication_classes = (CsrfExemptSessionAuthentication,BasicAuthentication)
+
+    def post(self, request, *args, **kwargs):
+        response = {}
+        response["status"] = 500
+
+        try:
+            data = request.data
+            user = request.user
+
+            try:
+                
+                try:
+                        
+                    user = CustomUser.objects.get(username = user.username)
+                    group = Group.objects.get(uuid = str(data['uuid']))
+
+                except Exception as e:
+                    print(str(e))
+                    response['status'] = 404
+            
+                response['name']   = group.name
+                response['admins'] = []
+                response['members'] = []
+                response['past_meets'] = []
+                response['ongoing_meets'] = []
+                response['upcoming_meets'] = []
+                response['isAdmin'] = "0"
+                response['created_date'] = group.get_created_date()
+
+                admin_set = set(group.admins.all())
+
+                for admin in admin_set:
+                    temp = {}
+                    temp['uuid'] = admin.uuid
+                    temp['username'] = admin.username
+                    temp['dp'] = settings.MEDIA_URL + admin.dp.name
+                    response['admins'].append(temp)
+
+                for member in group.members.all():
+                    if member not in admin_set:
+                        temp = {}
+                        temp['uuid'] = member.uuid
+                        temp['username'] = member.username
+                        temp['dp'] = settings.MEDIA_URL + member.dp.name
+                        response['members'].append(temp)
+                
+                if user in admin_set:
+                    response['isAdmin'] = "1"
+
+                past_meets = group.meetings.filter(end_time__lte = datetime.now())
+                ongoing = group.meetings.filter(start_time__lte = datetime.now(), end_time__gte = datetime.now())
+                upcoming = group.meetings.filter(start_time__gte = datetime.now())
+
+                for meet in past_meets:
+                    temp = {}
+                    temp['uuid'] = meet.uuid
+                    temp['name'] = meet.name
+                    temp['agenda'] = meet.agenda
+                    temp['time'] = meet.get_time()
+                    response['past_meets'].append(temp)
+
+                for meet in ongoing:
+                    temp = {}
+                    temp['uuid'] = meet.uuid
+                    temp['name'] = meet.name
+                    temp['agenda'] = meet.agenda
+                    temp['time'] = meet.get_time()
+                    response['ongoing_meets'].append(temp)
+                
+                for meet in upcoming:
+                    temp = {}
+                    temp['uuid'] = meet.uuid
+                    temp['name'] = meet.name
+                    temp['agenda'] = meet.agenda
+                    temp['time'] = meet.get_time()
+                    response['upcoming_meets'].append(temp)
+                    
+                response['status']=200
+
+            except Exception as e:
+                response['status']=400
+                print(str(e))
+
+        except Exception as e:
+            print("ERROR IN Get_Group_DetailsAPI", str(e))
+
+        return Response(data=response)
+
+Get_Group_Details = Get_Group_DetailsAPI.as_view()
