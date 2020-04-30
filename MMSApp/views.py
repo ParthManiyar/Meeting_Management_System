@@ -13,6 +13,7 @@ from django.contrib.auth.models import User
 from django.http import HttpResponse, HttpResponseRedirect
 
 import json
+import uuid
 
 # 400 Bad Request
 # 401 Unauthorized
@@ -75,7 +76,6 @@ class Login_SubmitAPI(APIView):
 
 Login_Submit = Login_SubmitAPI.as_view()
 
-
 class Signup_SubmitAPI(APIView):
 
     authentication_classes = (CsrfExemptSessionAuthentication,BasicAuthentication)
@@ -90,7 +90,8 @@ class Signup_SubmitAPI(APIView):
             if(len(User.objects.filter(username=data['username'])) == 0):
                 try:
                     user = CustomUser.objects.create(username=data['username'], email=data['email'], password=data["password"])
-
+                    user.uuid = str(uuid.uuid4())
+                    user.save()
                     response['status'] = 202
 
                 except:
@@ -132,7 +133,6 @@ class Get_All_UsersAPI(APIView):
 
 Get_All_Users = Get_All_UsersAPI.as_view()
 
-
 class Create_Group_SubmitAPI(APIView):
 
     authentication_classes = (CsrfExemptSessionAuthentication,BasicAuthentication)
@@ -145,29 +145,28 @@ class Create_Group_SubmitAPI(APIView):
             data = request.data
             user = request.user
 
+            user = CustomUser.objects.get(username = user.username)
+
             name = data['name']
             members = json.loads(data['members'])
 
-            if(len(Group.objects.filter(name = name))==0):
+            group = Group(name = name)
+            group.admins.add(user)
+            group.uuid = str(uuid.uuid4())
+            group.save()
 
-                group = Group(name = name)
+            for member in members:
+                print(member)
+                try:
+                    user_obj = CustomUser.objects.get(username = str(member))
+                    # print(user_obj)
+                    group.members.add(user_obj)
+                except Exception as e:
+                    print("error in ", str(e))
 
-                for member in members:
-                    print(member)
-                    try:
-                        user_obj = CustomUser.objects.get(username = str(member))
-                        group.members.add(user_obj)
-                    except:
-                        print("user not found!")
-
-                group.save()
-                print("group saved")
-                response['status'] = 200
-
-            else:
-                response['status'] = 409
-                response['result'] = "Group Name Conflicts"
-
+            group.save()
+            print("group saved")
+            response['status'] = 200
 
         except Exception as e:
             print("ERROR IN Create_Group_SubmitAPI", str(e))
@@ -175,3 +174,40 @@ class Create_Group_SubmitAPI(APIView):
         return Response(data=response)
 
 Create_Group_Submit = Create_Group_SubmitAPI.as_view()
+
+
+
+class Get_User_GroupsAPI(APIView):
+
+    authentication_classes = (CsrfExemptSessionAuthentication,BasicAuthentication)
+
+    def post(self, request, *args, **kwargs):
+        response = {}
+        response["status"] = 500
+
+        try:
+            data = request.data
+            user = request.user
+
+            user = CustomUser.objects.get(username = user.username)
+
+            group_list = user.member.all()
+
+            response['group_list'] = []
+
+            for g in group_list:
+                temp = {}
+                temp['uuid'] = g.uuid
+                temp['group_name'] = g.name
+
+                response['group_list'].append(temp)
+
+            response['status']=200
+
+        except Exception as e:
+            print("ERROR IN Create_Group_SubmitAPI", str(e))
+
+        return Response(data=response)
+
+Create_Group_Submit = Create_Group_SubmitAPI.as_view()
+
