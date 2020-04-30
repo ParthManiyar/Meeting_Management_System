@@ -77,7 +77,7 @@ class Meeting(models.Model):
 
     name         = models.CharField(max_length=200)
     agenda       = models.CharField(max_length=500)
-    admin        = models.ManyToManyField(CustomUser,related_name="meeting_admin")
+    admins       = models.ManyToManyField(CustomUser,related_name="meeting_admin")
     invitees     = models.ManyToManyField(CustomUser,related_name="invitee")
     attendees    = models.ManyToManyField(CustomUser,related_name="attendee")
     start_time   = models.DateTimeField()
@@ -104,4 +104,5 @@ class Notification(models.Model):
 
     title        = models.CharField(max_length=200)
     content      = models.CharField(max_length=300)
+    isRead       = models.BooleanField(default = False)
     target_users = models.ManyToManyField(CustomUser,related_name="notif")
