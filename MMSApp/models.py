@@ -54,6 +54,7 @@ class CustomUser(User):
 
     schedule = models.ManyToManyField(Schedule,related_name="schedule_users")
     uuid = models.CharField(max_length=100)
+    dp = models.FileField(upload_to='',blank=True)
 
     def __str__(self):
         return self.username

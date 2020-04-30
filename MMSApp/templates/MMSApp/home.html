@@ -194,7 +194,7 @@
                 $("#search_user_for_group").val("");
 
                 var temp_html = '\  <div class="chip">\
-                    <img src="images/yuna.jpg" alt="Contact Person">\
+                    <img src="/static/MMSApp/images/yuna.jpg" alt="Contact Person">\
                     '+user_input+'\
                     <i class="close material-icons remove_user">close</i>\
                     </div>';
@@ -244,32 +244,31 @@
              M.toast({html: 'Group Created successfully'});
              location.reload(true);
            }
-           else if(response['status']==409]){
-             M.toast({html: 'Name Already taken'})
+           else if(response['status']==409){
+             M.toast({html: 'Name Already taken'});
            }
          },
        });
      });
-
-     $.ajax({
-          url: "/xxxxxxxxxxxxxxx/",
-          type: "POST",
-          data: {
-          },
-          success: function(response) {
-            if(response['status']==200){
-              var temp = "";
-              for(var i=0;i<response['groups'].length;i++){
-                temp += '<a href="/groups/'+response[i]['uuid']+'" style="color:#003d72"></a><hr>';
-              }
-              group_list_id.append(temp);
+    $.ajax({
+        url: "/Get_User_Groups/",
+        type: "POST",
+        data: {
+        },
+        success: function(response) {
+          console.log(response);
+          if(response['status']==200){
+            var temp = "";
+            for(var i=0;i<response['groups'].length;i++){
+              temp += '<a href="/groups/'+response['groups'][i]['uuid']+'" style="color:#003d72">'+response['groups'][i]['group_name']+'</a><hr>';
             }
-          },
-        });
+            $("#group_list_id").append(temp);
+          }
+        },
       });
+
   });
-
-
+  
 </script>
 
 {% endblock %}

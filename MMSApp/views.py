@@ -14,6 +14,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 
 import json
 import uuid
+from django.core.files import File
 
 # 400 Bad Request
 # 401 Unauthorized
@@ -91,10 +92,13 @@ class Signup_SubmitAPI(APIView):
                 try:
                     user = CustomUser.objects.create(username=data['username'], email=data['email'], password=data["password"])
                     user.uuid = str(uuid.uuid4())
+                    dp = open(settings.MEDIA_URL+'png/'+data['username'].upper()[0]+'.png')
+                    user.dp = File(dp) 
                     user.save()
                     response['status'] = 202
 
-                except:
+                except Exception as e:
+                    print(str(e))
                     response['status'] = 400
             else:
                 response['status']  = 409
@@ -116,13 +120,15 @@ class Get_All_UsersAPI(APIView):
 
         try:
             data = request.data
+            user = request.user
 
             users = CustomUser.objects.all()
 
             response['users'] = {}
 
-            for user in users:
-                response['users'][user.username] = 1
+            for u in users:
+                if u.username != user.username:
+                    response['users'][u.username] = settings.MEDIA_URL+u.dp.name
 
             response['status'] = 200
 
@@ -151,9 +157,10 @@ class Create_Group_SubmitAPI(APIView):
             members = json.loads(data['members'])
 
             group = Group(name = name)
-            group.admins.add(user)
             group.uuid = str(uuid.uuid4())
             group.save()
+            group.admins.add(user)
+            group.members.add(user)
 
             for member in members:
                 print(member)
@@ -189,19 +196,23 @@ class Get_User_GroupsAPI(APIView):
 
             user = CustomUser.objects.get(username = user.username)
 
-            group_list = user.member.all()
+            try:
+                group_list = user.member.all()
 
-            response['group_list'] = []
+                response['groups'] = []
 
-            for g in group_list:
-                temp = {}
-                temp['uuid'] = g.uuid
-                temp['group_name'] = g.name
+                for g in group_list:
+                    temp = {}
+                    temp['uuid'] = g.uuid
+                    temp['group_name'] = g.name
 
-                response['group_list'].append(temp)
+                    response['groups'].append(temp)
 
-            response['status']=200
+                response['status']=200
 
+            except Exception as e:
+                response['status']=200
+                print(str(e))
         except Exception as e:
             print("ERROR IN Get_User_GroupsAPI", str(e))
 
