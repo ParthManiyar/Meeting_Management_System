@@ -2,36 +2,37 @@
 {% block content %}
 {% load static %}
 
-  <div class="container center" style="width:40%;">
-      <br>
-      <br>
+  <br>
+  <br>
+
+  <div class="container center" style="width:40%;background-color:#003d72">
       <br>
 
 
-      <span style="color:white;font-size:2em;">Login</span>
+      <span style="color:white;font-size:2em;text-decoration: underline">Login</span>
       <br>
       <br>
 
 
       <div class="row" style="border-radius:3px;">
-        <div class="input-field col s10 offset-s1">
+        <div class="input-field col s10 offset-s1" style="margin-bottom:0">
           <i class="material-icons prefix"  style="color:white">account_circle</i>
-          <input autocomplete="off" placeholder="Username" type="text" id="username_login_id" style="color:white">
+          <input autocomplete="off" placeholder="Username" type="text" id="username_login_id" style="color:white;font-size:0.85em;">
         </div>
 
-        <div class="input-field col s10 offset-s1 ">
+        <div class="input-field col s10 offset-s1 " style="margin-bottom:0">
           <i class="material-icons prefix" style="color:white">mode_edit</i>
-          <input autocomplete="off" placeholder="Password" type="password" id="password_login_id" style="color:white">
+          <input autocomplete="off" placeholder="Password" type="password" id="password_login_id" style="color:white;font-size:0.85em;">
         </div>
       </div>
+      <br>
 
       <button class="transparent-button" id="login_btn_id">Login</button>
 
       <br>
       <br>
-      <br>
 
-      <a href ="/signup" style="color:white;display:block;text-decoration: underline;"> Create New account? </a>
+      <a href ="/signup" style="color:white;display:block;text-decoration: underline;font-size:0.85em;"> Create New account? </a>
       <br>
 
     </div>
@@ -39,7 +40,7 @@
 
   <script type="text/javascript">
 
-    $("body").css("background-color","#003d72");
+    $("body").css("background-color","#cccccc");
 
     $("#login_btn_id" ).click(function() {
       login_submit()
@@ -61,7 +62,12 @@
             "password" : $("#password_login_id").val() ,
           },
           success: function(response) {
-            console.log(response);
+            if(response['status']==200){
+              M.toast({html: 'Welcome' + $("#username_login_id").val() + "!"});
+              window.location.pathname = '/home';
+            }
+            else
+               M.toast({html: 'Invalid Credentials'});
           },
           error: function(xhr, a, b)
           {

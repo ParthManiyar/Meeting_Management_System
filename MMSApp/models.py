@@ -11,7 +11,7 @@ class Venue(models.Model):
 #########
 
 class Event(models.Model):
-    
+
     start_time = models.TimeField()
     end_time   = models.TimeField()
     name       = models.CharField(max_length=200)
@@ -96,7 +96,7 @@ class Group(models.Model):
     admins       = models.ManyToManyField(CustomUser,related_name="admin")
     members      = models.ManyToManyField(CustomUser,related_name="member")
     meetings     = models.ManyToManyField(Meeting,related_name="group")
-    created_date = models.DateTimeField()
+    created_date = models.DateTimeField(auto_now=True)
 
 #########
 

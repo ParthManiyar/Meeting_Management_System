@@ -15,19 +15,22 @@
       <div class="modal-content" style="background-color:#003d72;color:white">
         <h4>Create New Group</h4>
         <br>
-        <p style="color:white"> Add people by searching </p>
-        <br>
 
         <div class="row">
-           <div class="col s6 offset-s3">
-             <div class="row">
-               <div class="input-field col s11">
+          <div class="input-field col s6 offset-s3">
+            <i class="material-icons prefix">name</i>
+            <input type="text" id="group_name_id" class="white-text">
+            <label for="group_name_id"> Group Name </label>
+          </div>
+        </div>
+
+        <div class="row">
+           <div class="input-field col s6 offset-s3">
                  <i class="material-icons prefix">search</i>
                  <input type="text" id="search_user_for_group" class="autocomplete white-text">
-               </div>
-             </div>
+                 <label for="search_user_for_group"> Add people </label>
            </div>
-           <div class="col s1" style="padding-top:1em;">
+           <div class="col s1" style="padding-top:1.3em;">
              <button class="transparent-button" id="add_user_btn_for_group">Add</button>
           </div>
         </div>
@@ -39,7 +42,8 @@
 
       </div>
       <div class="modal-footer">
-        <a href="#!" class="modal-close waves-effect waves-green btn-flat">Create</a>
+        <a href="#!" id = "submit_group_id" class="waves-effect waves-green btn-flat">Create</a>
+        <a href="#!" class="left modal-close waves-effect waves-blue btn-flat">Back</a>
       </div>
     </div>
 
@@ -111,8 +115,21 @@
   $(document).ready(function(){
 
     var typed_users = {};
+    var user_dict = {};
 
-    user_dict = {"akash":null, "random":null};
+    $.ajax({
+         url: "/Get_All_Users/",
+         type: "POST",
+         async: false,
+         data: {
+         },
+         success: function(response) {
+           if(response['status']==200){
+             user_dict = response['users'];
+           }
+         },
+       });
+
       console.log($("#search_user_for_group").length);
       var instance = M.Autocomplete.getInstance($("#search_user_for_group"));
       instance.updateData(user_dict);
@@ -120,6 +137,10 @@
         function add_user(){
 
            var user_input = $("#search_user_for_group").val();
+           user_input = user_input.toLowerCase();
+
+          if(user_input.length == 0)
+            return;
 
             if(user_input in user_dict){
                 if(user_input in typed_users){
@@ -158,7 +179,38 @@
             delete typed_users[username];
         })
     });
+
+
+  $("#submit_group_id").click(function(){
+
+    users_list = JSON.stringify(typed_users);
+
+    if($('#group_name_id').val() == "" || users_list == ""){
+      M.toast({html: 'All inputs are compulsory'});
+      return ;
+    }
+
+    $.ajax({
+         url: "/Create_Group_Submit/",
+         type: "POST",
+         data: {
+           'name' : $('#group_name_id').val()  ,
+           'members' : users_list,
+         },
+         success: function(response) {
+           if(response['status']==200){
+             M.toast({html: 'Group Created successfully'});
+             location.reload(true);
+           }
+           else {
+             M.toast({html: 'Some Error occurred'})
+           }
+         },
+       });
   });
+  });
+
+
 </script>
 
 {% endblock %}

@@ -2,41 +2,42 @@
 {% block content %}
 {% load static %}
 
-  <div class="container center" style="width:40%;">
-      <br>
-      <br>
+<br>
+<br>
+
+  <div class="container center" style="width:40%;background-color:#003d72">
       <br>
 
-
-      <span style="color:white;font-size:2em;">Signup</span>
+      <span style="color:white;font-size:2em;text-decoration: underline">Signup</span>
       <br>
       <br>
 
 
       <div class="row" style="border-radius:3px;">
-        <div class="input-field col s10 offset-s1">
+        <div class="input-field col s10 offset-s1" style="margin-bottom:0">
           <i class="material-icons prefix" style="color:white">account_circle</i>
-          <input autocomplete="off" placeholder="Username"  type="text" id="username_signup_id" style="color:white">
+          <input autocomplete="off" placeholder="Username"  type="text" id="username_signup_id" style="color:white;font-size:0.85em;">
         </div>
 
-        <div class="input-field col s10 offset-s1 ">
+        <div class="input-field col s10 offset-s1 " style="margin-bottom:0">
           <i class="material-icons prefix" style="color:white">mode_edit</i>
-          <input autocomplete="off" placeholder="Password" type="password" id="password_signup_id" style="color:white">
+          <input autocomplete="off" placeholder="Password" type="password" id="password_signup_id" style="color:white;font-size:0.85em;">
         </div>
 
-        <div class="input-field col s10 offset-s1 ">
+        <div class="input-field col s10 offset-s1 " style="margin-bottom:0">
           <i class="material-icons prefix" style="color:white">email</i>
-          <input autocomplete="off" placeholder="University Email"  type="text" id="email_signup_id" style="color:white">
+          <input autocomplete="off" placeholder="University Email"  type="text" id="email_signup_id" style="color:white;font-size:0.85em;">
         </div>
       </div>
+
+      <br>
 
       <button class="transparent-button" id="signup_btn_id">Signup</button>
 
       <br>
       <br>
-      <br>
 
-      <a href ="/login" style="color:white;display:block;text-decoration: underline;"> Already have an account? </a>
+      <a href ="/login" style="color:white;display:block;text-decoration: underline;font-size:0.85em;"> Already have an account? </a>
       <br>
 
     </div>
@@ -44,7 +45,7 @@
 
     <script type="text/javascript">
 
-    $("body").css("background-color","#003d72");
+      $("body").css("background-color","#cccccc");
 
       $("#signup_btn_id" ).click(function() {
         signup_submit()
@@ -66,7 +67,18 @@
               "email" : $("#email_signup_id").val() ,
             },
             success: function(response) {
+
               console.log(response);
+
+              if(response['status'] == 409)
+                 M.toast({html: 'Username already taken!'});
+              else if(response['status'] == 202){
+                M.toast({html: 'Account successfully created'});
+                M.toast({html: 'Login to enter'});
+                window.location.pathname = '/login';
+              }
+              else
+                 M.toast({html: 'Some Unexpcted Error occurred'});
             },
             error: function(xhr, a, b)
             {
