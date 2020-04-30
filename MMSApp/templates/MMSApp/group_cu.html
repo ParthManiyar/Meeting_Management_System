@@ -1,0 +1,156 @@
+{% extends 'MMSApp/base.html' %}
+{% block content %}
+{% load static %}
+
+<!-- <a class="btn-floating btn-large waves-effect waves-light modal-trigger" style="background-color:#003d72" href="#group_modal" ><i class="material-icons">add</i></a> -->
+<!-- <h4> Groups </h4> -->
+
+  <br><br>
+
+
+  <div class="container center" style="width:60%;background-color:#003d72;color:white">
+    <br>
+    <h4>Create New Group</h4>
+    <br>
+    <div class="row">
+      <div class="input-field col s6 offset-s3">
+        <i class="material-icons prefix">web_asset</i>
+        <input type="text" id="group_name_id" class="white-text">
+        <label for="group_name_id"> Group Name </label>
+      </div>
+    </div>
+    <div class="row">
+       <div class="input-field col s6 offset-s3">
+             <i class="material-icons prefix">search</i>
+             <input type="text" id="search_user_for_group" class="autocomplete white-text">
+             <label for="search_user_for_group"> Add people </label>
+       </div>
+       <div class="col s1" style="padding-top:1.3em;">
+         <button class="transparent-button" id="add_user_btn_for_group">Add</button>
+      </div>
+    </div>
+  <br>
+  <div class="row" id="all_users_for_group">
+  </div>
+  <br>
+  <button class="transparent-button"  id = "submit_group_id">Create</button>
+  <br><br>
+  </div>
+
+
+
+
+<script type="text/javascript">
+
+  $(document).ready(function(){
+
+    var typed_users = {};
+    var user_dict = {};
+
+    $.ajax({
+         url: "/Get_All_Users/",
+         type: "POST",
+         async: false,
+         data: {
+         },
+         success: function(response) {
+           if(response['status']==200){
+             user_dict = response['users'];
+           }
+         },
+       });
+
+      console.log($("#search_user_for_group").length);
+      var instance = M.Autocomplete.getInstance($("#search_user_for_group"));
+      instance.updateData(user_dict);
+
+        function add_user(){
+
+           var user_input = $("#search_user_for_group").val();
+           user_input = user_input.toLowerCase();
+          console.log(user_input);
+
+          if(user_input.length == 0)
+            return;
+
+            if(user_input in user_dict){
+                if(user_input in typed_users){
+                   M.toast({html:"User already added"});
+                   return;
+                }
+                typed_users[user_input] = 1;
+                M.toast({html:"User successfully added"});
+                $("#search_user_for_group").val("");
+
+                var temp_html = '\  <div class="chip">\
+                    <img src="/static/MMSApp/images/yuna.jpg" alt="Contact Person">\
+                    '+user_input+'\
+                    <i class="close material-icons remove_user">close</i>\
+                    </div>';
+                $("#all_users_for_group").append(temp_html);
+                instance.close();
+
+            }
+            else{
+               M.toast({html:"User doesn't exist"});
+            }
+        }
+
+        $("#add_user_btn_for_group").click(function(){
+          add_user();
+        })
+        $(document).on('keypress',function(e) {
+          if(e.which == 13) {
+              add_user();
+          }
+
+        $(".remove_user").click(function(){
+
+            var username = $(this).parent().text().replace("close","").trim();
+            delete typed_users[username];
+        })
+    });
+
+
+
+  $("#submit_group_id").click(function(){
+
+    users_list = JSON.stringify(typed_users);
+
+    if($('#group_name_id').val() == "" || users_list == ""){
+      M.toast({html: 'All inputs are compulsory'});
+      return ;
+    }
+
+    $.ajax({
+         url: "/Create_Group_Submit/",
+         type: "POST",
+         data: {
+           'name' : $('#group_name_id').val()  ,
+           'members' : users_list,
+         },
+         success: function(response) {
+           if(response['status']==200){
+             M.toast({html: 'Group Created successfully'});
+             location.reload(true);
+           }
+           else if(response['status']==409){
+             M.toast({html: 'Name Already taken'});
+           }
+         },
+       });
+     });
+
+     function isEdit(){
+
+       
+     }
+
+     if()
+
+    });
+
+
+</script>
+
+{% endblock %}
