@@ -25,3 +25,68 @@
 .input-field input[type=text]:focus + label {
     color: #000;
 }
+
+
+.fancyScroll::-webkit-scrollbar-track
+{
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+	background-color: #F5F5F5;
+}
+
+.fancyScroll::-webkit-scrollbar
+{
+	width: 6px;
+	background-color: #F5F5F5;
+}
+
+.fancyScroll::-webkit-scrollbar-thumb
+{
+	background-color: #003d72;
+}
+
+
+
+
+
+.fancyScrollreverse::-webkit-scrollbar-track
+{
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+	background-color: #003d72;
+}
+
+.fancyScrollreverse::-webkit-scrollbar
+{
+	width: 6px;
+	background-color: #F5F5F5;
+}
+
+.fancyScrollreverse::-webkit-scrollbar-thumb
+{
+	background-color: #F5F5F5;
+}
+
+
+
+
+
+
+
+
+.tabs .tab a{
+      color:white;
+      background-color: grey;
+  } /*Black color to the text*/
+
+  .tabs .tab a:hover {
+      background-color: grey;
+      color:#003d72;
+  } /*Text color on hover*/
+
+  .tabs .tab a.active {
+      background-color: #003d72;
+      color:white;
+  } /*Background and text color when a tab is active*/
+
+  .tabs .indicator {
+      background-color:#003d72;
+  } /*Color of underline*/

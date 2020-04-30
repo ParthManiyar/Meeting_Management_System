@@ -11,11 +11,13 @@
     <a class="btn-floating btn-large waves-effect waves-light modal-trigger" style="background-color:#003d72" href="#group_modal" ><i class="material-icons">add</i></a>
     <h4> Groups </h4>
 
+    <div class="container fancyScroll" id="group_list_id" style="height:500px;overflow-y:auto;box-shadow: inset 0px 0px 5px 1px #003d72;width:80%">
+    </div>
+
     <div id="group_modal" class="modal" >
       <div class="modal-content" style="background-color:#003d72;color:white">
         <h4>Create New Group</h4>
         <br>
-
         <div class="row">
           <div class="input-field col s6 offset-s3">
             <i class="material-icons prefix">name</i>
@@ -23,7 +25,6 @@
             <label for="group_name_id"> Group Name </label>
           </div>
         </div>
-
         <div class="row">
            <div class="input-field col s6 offset-s3">
                  <i class="material-icons prefix">search</i>
@@ -34,30 +35,76 @@
              <button class="transparent-button" id="add_user_btn_for_group">Add</button>
           </div>
         </div>
-
       <br>
-
       <div class="row" id="all_users_for_group">
       </div>
-
       </div>
       <div class="modal-footer">
         <a href="#!" id = "submit_group_id" class="waves-effect waves-green btn-flat">Create</a>
         <a href="#!" class="left modal-close waves-effect waves-blue btn-flat">Back</a>
       </div>
     </div>
-
   </div>
 
-  <div class="col s4">
+  <div class="col s7">
 
     <br>
 
     <a class="btn-floating btn-large waves-effect waves-light modal-trigger" style="background-color:#003d72" href="#meeting_modal" ><i class="material-icons">add</i></a>
     <h4> Meetings </h4>
 
-    <div id="meeting_modal" class="modal" >
-      <div class="modal-content" style="background-color:#003d72;color:white;scroll:auto">
+    <div class="row" style="padding-right:0px;margin-right:0px">
+      <div class="col s12">
+        <ul class="tabs" style="background-color:#003d72;">
+          <li class="tab col s4"><a href="#test1" >Onging Meetings</a></li>
+          <li class="tab col s4"><a class="active" href="#test2">Upcoming Meetings</a></li>
+          <li class="tab col s4"><a href="#test4" >Past Meetings</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="fancyScroll" style="height:500px;overflow-y:auto;">
+
+
+    <p> a </p>
+    <p> a </p>
+    <p> a </p>
+    <p> a </p>
+    <p> a </p>
+    <p> a </p>
+    <p> a </p>
+    <p> a </p>
+    <p> a </p>
+    <p> a </p>
+    <p> a </p>
+    <p> a </p>
+    <p> a </p>
+    <p> a </p>
+    <p> a </p>
+    <p> a </p>
+    <p> a </p>
+    <p> a </p>
+    <p> a </p>
+    <p> a </p>
+    <p> a </p>
+    <p> a </p>
+    <p> a </p>
+    <p> a </p>
+    <p> a </p>
+    <p> a </p>
+    <p> a </p>
+    <p> a </p>
+    <p> a </p>
+    <p> a </p>
+    <p> a </p>
+    <p> a </p>
+    <p> a </p>
+    <p> a </p>
+    <p> a </p>
+    </div>
+
+    <div id="meeting_modal" class="modal fancyScrollreverse" >
+      <div class="modal-content" style="background-color:#003d72;color:white;overflow-y:auto">
         <h4>Call a Meet</h4>
         <br>
         <p> Select a group </p>
@@ -65,21 +112,21 @@
 
         <div class="row">
           <div class="input-field col s4 offset-s1">
-            <input placeholder="Name" id="meeting_name" type="text" style="color:white">
+            <input  id="meeting_name" type="text" style="color:white">
             <label for="meeting_name">Name</label>
           </div>
           <div class="input-field col s4 offset-s2">
-            <input placeholder="Agenda" id="meeting_agenda" type="text" style="color:white">
+            <input  id="meeting_agenda" type="text" style="color:white">
             <label for="meeting_agenda">Agenda</label>
           </div>
         </div>
         <div class="row">
           <div class="input-field col s4 offset-s1">
-            <input placeholder="Venue" id="meeting_venue" type="text" style="color:white">
+            <input  id="meeting_venue" type="text" style="color:white">
             <label for="meeting_venue">Venue</label>
           </div>
           <div class="input-field col s4 offset-s2">
-            <input class="datepicker" placeholder="Date" id="meeting_date" type="text" style="color:white">
+            <input class="datepicker" id="meeting_date" type="text" style="color:white">
             <label for="meeting_date">Date</label>
           </div>
         </div>
@@ -99,12 +146,6 @@
         <a href="#!" class="modal-close waves-effect waves-green btn-flat">Call</a>
       </div>
     </div>
-
-  </div>
-
-  <div class="col s4">
-
-    <p> Schedule </p>
 
   </div>
 
@@ -202,12 +243,29 @@
              M.toast({html: 'Group Created successfully'});
              location.reload(true);
            }
-           else {
-             M.toast({html: 'Some Error occurred'})
+           else if(response['status']==409]){
+             M.toast({html: 'Name Already taken'})
            }
          },
        });
-  });
+     });
+
+     $.ajax({
+          url: "/xxxxxxxxxxxxxxx/",
+          type: "POST",
+          data: {
+          },
+          success: function(response) {
+            if(response['status']==200){
+              var temp = "";
+              for(var i=0;i<response['groups'].length;i++){
+                temp += '<a href="/groups/'+response[i]['uuid']+'" style="color:#003d72"></a><hr>';
+              }
+              group_list_id.append(temp);
+            }
+          },
+        });
+      });
   });
 
 
