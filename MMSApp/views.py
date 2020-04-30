@@ -54,7 +54,19 @@ def Logout(request):
 
 @login_required(login_url='/login/')
 def Single_Group(request, group_uuid):
-    return render(request,'MMSApp/group.html')
+    return render(request,'MMSApp/group_rd.html')
+
+@login_required(login_url='/login/')
+def Create_Group(request):
+    return render(request,'MMSApp/group_cu.html')
+
+@login_required(login_url='/login/')
+def Create_Meeting(request):
+    return render(request,'MMSApp/meeting_cu.html')
+
+@login_required(login_url='/login/')
+def Single_Meeting(request):
+    return render(request,'MMSApp/meeting_rd.html')
 
 # API SECTION BELOW
 
