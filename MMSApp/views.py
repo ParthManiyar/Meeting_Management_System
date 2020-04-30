@@ -175,8 +175,6 @@ class Create_Group_SubmitAPI(APIView):
 
 Create_Group_Submit = Create_Group_SubmitAPI.as_view()
 
-
-
 class Get_User_GroupsAPI(APIView):
 
     authentication_classes = (CsrfExemptSessionAuthentication,BasicAuthentication)
@@ -205,9 +203,9 @@ class Get_User_GroupsAPI(APIView):
             response['status']=200
 
         except Exception as e:
-            print("ERROR IN Create_Group_SubmitAPI", str(e))
+            print("ERROR IN Get_User_GroupsAPI", str(e))
 
         return Response(data=response)
 
-Create_Group_Submit = Create_Group_SubmitAPI.as_view()
+Get_User_Groups = Get_User_GroupsAPI.as_view()
 
