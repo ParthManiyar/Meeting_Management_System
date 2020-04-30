@@ -17,7 +17,7 @@
       </div>
     </div>
 
-    <div class="container fancyScroll" id="member_list_id" style="height:500px;overflow-y:auto;">
+    <div class="fancyScroll" id="member_list_id" style="height:500px;overflow-y:auto;overflow-x:hidden;width:95%">
     </div>
 
   </div>
@@ -25,10 +25,6 @@
   <div class="col s6 offset-s1">
 
     <br><br><br>
-
-    <!-- <a class="btn-floating btn-large waves-effect waves-light modal-trigger" style="background-color:#003d72" href="#meeting_modal" ><i class="material-icons">add</i></a> -->
-    <!-- <h4> Meetings </h4> -->
-
 
     <div class="row" style="padding-right:0px;margin-right:0px">
       <div class="col s12">
@@ -51,22 +47,43 @@
 
   $(document).ready(function(){
 
-    // $.ajax({
-    //     url: "/xxxxxxxxxxxx/",
-    //     type: "POST",
-    //     data: {
-    //     },
-    //     success: function(response) {
-    //       console.log(response);
-    //       if(response['status']==200){
-    //         var temp = "";
-    //         for(var i=0;i<response['groups'].length;i++){
-    //           temp += '<a href="/groups/'+response['groups'][i]['uuid']+'" style="color:#003d72">'+response['groups'][i]['group_name']+'</a><hr>';
-    //         }
-    //         $("#member_list_id").append(temp);
-    //       }
-    //     },
-    //   });
+    uuid = window.location.pathname;
+    uuid = uuid.split("/")[2];
+
+    $.ajax({
+        url: "/Get_Group_Details/",
+        type: "POST",
+        data: {
+          'uuid' : uuid,
+        },
+        success: function(response) {
+          console.log(response);
+          if(response['status']==200){
+            var temp = "";
+            for(var i=0;i<response['admins'].length;i++){
+              temp += '<div class="row valign-wrapper center-align zero-margin">\
+                <div class="col s2">\
+                  <img src='+response['admins'][i]['dp']+' alt="Avatar" style="width:3em;height:3em;">\
+                </div>\
+                <div class="col s10">\
+                  <a href="/profile/'+response['admins'][i]['username']+'">'+response['admins'][i]['username']+'</a>\
+                </div>\
+              </div><hr>';
+            }
+            for(var i=0;i<response['members'].length;i++){
+              temp += '<div class="row valign-wrapper center-align zero-margin">\
+                <div class="col s2">\
+                  <img src='+response['members'][i]['dp']+' alt="Avatar" style="width:3em;height:3em;">\
+                </div>\
+                <div class="col s10">\
+                  <a href="/profile/'+response['members'][i]['username']+'">'+response['members'][i]['username']+'</a>\
+                </div>\
+              </div><hr>';
+            }
+            $("#member_list_id").append(temp);
+          }
+        },
+      });
 
   });
 

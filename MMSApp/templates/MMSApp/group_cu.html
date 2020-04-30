@@ -2,12 +2,7 @@
 {% block content %}
 {% load static %}
 
-<!-- <a class="btn-floating btn-large waves-effect waves-light modal-trigger" style="background-color:#003d72" href="#group_modal" ><i class="material-icons">add</i></a> -->
-<!-- <h4> Groups </h4> -->
-
   <br><br>
-
-
   <div class="container center" style="width:60%;background-color:#003d72;color:white">
     <br>
     <h4>Create New Group</h4>
@@ -36,9 +31,6 @@
   <button class="transparent-button"  id = "submit_group_id">Create</button>
   <br><br>
   </div>
-
-
-
 
 <script type="text/javascript">
 
@@ -143,10 +135,15 @@
 
      function isEdit(){
 
-       
+       var temp = window.location.pathname;
+       temp = temp.split("/")[1];
+       if(temp=='edit')
+        return true
      }
 
-     if()
+     if(isEdit){
+       
+     }
 
     });
 

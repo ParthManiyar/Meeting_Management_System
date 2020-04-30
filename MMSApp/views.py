@@ -14,7 +14,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 
 import json
 import uuid
-import datetime
+from datetime import datetime
 
 from django.core.files import File
 from io import BytesIO
@@ -265,16 +265,16 @@ class Get_Group_DetailsAPI(APIView):
             user = request.user
 
             try:
-                
+
                 try:
-                        
+
                     user = CustomUser.objects.get(username = user.username)
                     group = Group.objects.get(uuid = str(data['uuid']))
 
                 except Exception as e:
                     print(str(e))
                     response['status'] = 404
-            
+
                 response['name']   = group.name
                 response['admins'] = []
                 response['members'] = []
@@ -300,7 +300,7 @@ class Get_Group_DetailsAPI(APIView):
                         temp['username'] = member.username
                         temp['dp'] = settings.MEDIA_URL + member.dp.name
                         response['members'].append(temp)
-                
+
                 if user in admin_set:
                     response['isAdmin'] = "1"
 
@@ -323,7 +323,7 @@ class Get_Group_DetailsAPI(APIView):
                     temp['agenda'] = meet.agenda
                     temp['time'] = meet.get_time()
                     response['ongoing_meets'].append(temp)
-                
+
                 for meet in upcoming:
                     temp = {}
                     temp['uuid'] = meet.uuid
@@ -331,7 +331,7 @@ class Get_Group_DetailsAPI(APIView):
                     temp['agenda'] = meet.agenda
                     temp['time'] = meet.get_time()
                     response['upcoming_meets'].append(temp)
-                    
+
                 response['status']=200
 
             except Exception as e:
