@@ -13,6 +13,5 @@ urlpatterns = [
     path('Get_All_Users/', views.Get_All_Users),
     path('Create_Group_Submit/', views.Create_Group_Submit),
     path('Get_User_Groups/',views.Get_User_Groups),
-    # path('group/<str:group_uuid>/', views.Single_Group),
-
+    path('groups/<str:group_uuid>/', views.Single_Group),
 ]

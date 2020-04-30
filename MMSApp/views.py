@@ -16,6 +16,10 @@ import json
 import uuid
 from django.core.files import File
 
+from io import BytesIO
+from PIL import Image as IMage
+from django.core.files.uploadedfile import InMemoryUploadedFile
+
 # 400 Bad Request
 # 401 Unauthorized
 # 403 Forbidden
@@ -47,6 +51,10 @@ def Signup(request):
 def Logout(request):
     logout(request)
     return HttpResponseRedirect('/login/')
+
+@login_required(login_url='/login/')
+def Single_Group(request, group_uuid):
+    return render(request,'MMSApp/group.html')
 
 # API SECTION BELOW
 
@@ -92,8 +100,18 @@ class Signup_SubmitAPI(APIView):
                 try:
                     user = CustomUser.objects.create(username=data['username'], email=data['email'], password=data["password"])
                     user.uuid = str(uuid.uuid4())
-                    dp = open(settings.MEDIA_URL+'png/'+data['username'].upper()[0]+'.png')
-                    user.dp = File(dp) 
+
+                    filepath = settings.STATIC_ROOT+'/MMSApp/images/'+data['username'].upper()[0]+'.png'
+                    print(filepath)
+
+                    thumb = IMage.open(filepath)
+                    im_type = thumb.format
+                    thumb_io = BytesIO()
+                    thumb.save(thumb_io, format=im_type)
+
+                    thumb_file = InMemoryUploadedFile(thumb_io, None, filepath, 'image/'+im_type, thumb_io.getbuffer(), None)
+                    user.dp = thumb_file
+
                     user.save()
                     response['status'] = 202
 
@@ -128,7 +146,7 @@ class Get_All_UsersAPI(APIView):
 
             for u in users:
                 if u.username != user.username:
-                    response['users'][u.username] = settings.MEDIA_URL+u.dp.name
+                    response['users'][u.username] = settings.MEDIA_ROOT+u.dp.name
 
             response['status'] = 200
 
@@ -219,4 +237,3 @@ class Get_User_GroupsAPI(APIView):
         return Response(data=response)
 
 Get_User_Groups = Get_User_GroupsAPI.as_view()
-

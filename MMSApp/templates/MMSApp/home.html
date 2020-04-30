@@ -4,14 +4,22 @@
 
 <div class="row center">
 
-  <div class="col s4">
+  <div class="col s3 offset-s1">
 
-    <br>
+    <br><br><br>
 
-    <a class="btn-floating btn-large waves-effect waves-light modal-trigger" style="background-color:#003d72" href="#group_modal" ><i class="material-icons">add</i></a>
-    <h4> Groups </h4>
+    <div class="row" style="padding-right:0px;margin-right:0px">
+      <div class="col s12">
+        <ul class="tabs" style="background-color:#003d72;">
+          <li class="tab col s12"><a class="active" >My groups</a></li>
+        </ul>
+      </div>
+    </div>
 
-    <div class="container fancyScroll" id="group_list_id" style="height:500px;overflow-y:auto;box-shadow: inset 0px 0px 5px 1px #003d72;width:80%">
+    <!-- <a class="btn-floating btn-large waves-effect waves-light modal-trigger" style="background-color:#003d72" href="#group_modal" ><i class="material-icons">add</i></a> -->
+    <!-- <h4> Groups </h4> -->
+
+    <div class="container fancyScroll" id="group_list_id" style="height:500px;overflow-y:auto;">
     </div>
 
     <div id="group_modal" class="modal" >
@@ -46,19 +54,20 @@
     </div>
   </div>
 
-  <div class="col s7">
+  <div class="col s6 offset-s1">
 
-    <br>
+    <br><br><br>
 
-    <a class="btn-floating btn-large waves-effect waves-light modal-trigger" style="background-color:#003d72" href="#meeting_modal" ><i class="material-icons">add</i></a>
-    <h4> Meetings </h4>
+    <!-- <a class="btn-floating btn-large waves-effect waves-light modal-trigger" style="background-color:#003d72" href="#meeting_modal" ><i class="material-icons">add</i></a> -->
+    <!-- <h4> Meetings </h4> -->
+
 
     <div class="row" style="padding-right:0px;margin-right:0px">
       <div class="col s12">
         <ul class="tabs" style="background-color:#003d72;">
-          <li class="tab col s4"><a href="#test1" >Onging Meetings</a></li>
-          <li class="tab col s4"><a class="active" href="#test2">Upcoming Meetings</a></li>
-          <li class="tab col s4"><a href="#test4" >Past Meetings</a></li>
+          <li class="tab col s4"><a href="#ongoing_tab_id" >Onging Meetings</a></li>
+          <li class="tab col s4"><a class="active" href="#upcoming_tab_id">Upcoming Meetings</a></li>
+          <li class="tab col s4"><a href="#past_tab_id" >Past Meetings</a></li>
         </ul>
       </div>
     </div>
@@ -268,7 +277,7 @@
       });
 
   });
-  
+
 </script>
 
 {% endblock %}

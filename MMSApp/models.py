@@ -14,7 +14,7 @@ class Venue(models.Model):
 #########
 
 class Event(models.Model):
-    
+
     start_time = models.TimeField()
     end_time   = models.TimeField()
     name       = models.CharField(max_length=200)
@@ -54,7 +54,7 @@ class CustomUser(User):
 
     schedule = models.ManyToManyField(Schedule,related_name="schedule_users")
     uuid = models.CharField(max_length=100)
-    dp = models.FileField(upload_to='',blank=True)
+    dp = models.ImageField(upload_to='',blank=True)
 
     def __str__(self):
         return self.username
@@ -74,7 +74,7 @@ class Message(models.Model):
     uuid = models.CharField(max_length=100)
 
     def __str__(self):
-        return self.text    
+        return self.text
 
 #########
 
