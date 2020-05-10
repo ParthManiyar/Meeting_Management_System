@@ -3,11 +3,21 @@
 {% load static %}
 
 
-<div class="row center">
+<div class="row">
 
   <div class="col s3 offset-s1">
 
     <br><br><br>
+
+    <div class="row">
+      <div class="col s5">
+          <a href="#!" id="leave_group_button_id" class="waves-effect waves-light btn" ><i class="material-icons left">exit_to_app</i>Leave</a>
+      </div>
+      <div class="col s4">
+          <a href="#!" id="edit_group_button_id" class="waves-effect waves-light btn" style="display:none" ><i class="material-icons left">create</i>Edit</a>
+      </div>
+    </div>
+
 
     <div class="row" style="padding-right:0px;margin-right:0px">
       <div class="col s12">
@@ -50,6 +60,10 @@
     uuid = window.location.pathname;
     uuid = uuid.split("/")[2];
 
+    $('#edit_group_button_id').attr("href","/edit/group/"+uuid);
+    // $('#leave_group_button_id').attr("href","/edit/group/"+uuid); // API LEFT-------------------------------
+
+
     $.ajax({
         url: "/Get_Group_Details/",
         type: "POST",
@@ -61,17 +75,20 @@
           if(response['status']==200){
             var temp = "";
             for(var i=0;i<response['admins'].length;i++){
-              temp += '<div class="row valign-wrapper center-align zero-margin">\
+              temp += '<div class="row valign-wrapper zero-margin">\
                 <div class="col s2">\
                   <img src='+response['admins'][i]['dp']+' alt="Avatar" style="width:3em;height:3em;">\
                 </div>\
-                <div class="col s10">\
+                <div class="col s7" style="overflow-x:auto">\
                   <a href="/profile/'+response['admins'][i]['username']+'">'+response['admins'][i]['username']+'</a>\
+                </div>\
+                <div class="col s3">\
+                  <span style="font-size:0.75em;">Admin</span>\
                 </div>\
               </div><hr>';
             }
             for(var i=0;i<response['members'].length;i++){
-              temp += '<div class="row valign-wrapper center-align zero-margin">\
+              temp += '<div class="row valign-wrapper zero-margin">\
                 <div class="col s2">\
                   <img src='+response['members'][i]['dp']+' alt="Avatar" style="width:3em;height:3em;">\
                 </div>\
@@ -81,6 +98,8 @@
               </div><hr>';
             }
             $("#member_list_id").append(temp);
+            if(response['isAdmin'])
+              jQuery('#edit_group_button_id').show()
           }
         },
       });

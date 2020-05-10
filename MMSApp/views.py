@@ -22,6 +22,10 @@ from PIL import Image as IMage
 from django.core.files.uploadedfile import InMemoryUploadedFile
 
 import logging
+import sys
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+import traceback
 
 # 400 Bad Request
 # 401 Unauthorized
@@ -75,6 +79,14 @@ def Single_Meeting(request):
 def Edit_Group(request, group_uuid):
     return render(request,'MMSApp/group_cu.html')
 
+# LOGGER
+
+def error():
+    exc_type, exc_value, exc_traceback = sys.exc_info()
+    print("\nLINE = :", exc_traceback.tb_lineno)
+    formatted_lines = traceback.format_exc().splitlines()
+    print("ERROR = ", formatted_lines[-1],end="\n")
+
 # API SECTION BELOW
 
 class Login_SubmitAPI(APIView):
@@ -98,7 +110,8 @@ class Login_SubmitAPI(APIView):
                 response['status'] = 401
 
         except Exception as e:
-            print("ERROR IN Login_SubmitAPI", str(e))
+            error()
+            print("ERROR IN = Login_SubmitAPI", str(e))
 
         return Response(data=response)
 
@@ -141,7 +154,8 @@ class Signup_SubmitAPI(APIView):
                 response['status']  = 409
 
         except Exception as e:
-            print("ERROR IN Signup_SubmitAPI", str(e))
+            error()
+            print("ERROR = Signup_SubmitAPI", str(e))
 
         return Response(data=response)
 
@@ -170,9 +184,8 @@ class Get_All_UsersAPI(APIView):
             response['status'] = 200
 
         except Exception as e:
-            formatter = logging.Formatter('[%(asctime)s] p%(process)s {%(pathname)s:%(lineno)d} %(levelname)s - %(message)s','%m-%d %H:%M:%S')
-            print(formatter)
-            print("ERROR IN Get_User_ListAPI", str(e))
+            error()
+            print("ERROR IN = Get_User_ListAPI", str(e))
 
         return Response(data=response)
 
@@ -216,7 +229,8 @@ class Create_Group_SubmitAPI(APIView):
             response['status'] = 200
 
         except Exception as e:
-            print("ERROR IN Create_Group_SubmitAPI", str(e))
+            error()
+            print("ERROR IN  = Create_Group_SubmitAPI", str(e))
 
         return Response(data=response)
 
@@ -254,7 +268,8 @@ class Get_User_GroupsAPI(APIView):
                 response['status']=200
                 print(str(e))
         except Exception as e:
-            print("ERROR IN Get_User_GroupsAPI", str(e))
+            error()
+            print("ERROR IN = Get_User_GroupsAPI", str(e))
 
         return Response(data=response)
 
@@ -348,7 +363,8 @@ class Get_Group_DetailsAPI(APIView):
                 print(str(e))
 
         except Exception as e:
-            print("ERROR IN Get_Group_DetailsAPI", str(e))
+            error()
+            print("ERROR IN = Get_Group_DetailsAPI", str(e))
 
         return Response(data=response)
 
@@ -460,9 +476,8 @@ class Edit_Group_SubmitAPI(APIView):
             response['status'] = 200
 
         except Exception as e:
-            formatter = logging.Formatter('[%(asctime)s] p%(process)s {%(pathname)s:%(lineno)d} %(levelname)s - %(message)s','%m-%d %H:%M:%S')
-            print(formatter)
-            print("ERROR IN Edit_Group_SubmitAPI", str(e))
+            error()
+            print("ERROR IN = Edit_Group_SubmitAPI", str(e))
 
         return Response(data=response)
 
