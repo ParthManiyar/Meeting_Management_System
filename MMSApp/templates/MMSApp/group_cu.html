@@ -5,7 +5,7 @@
   <br><br>
   <div class="container center" style="width:60%;background-color:#003d72;color:white">
     <br>
-    <h4>Create New Group</h4>
+    <h4 Class="heading" style="text-decoration:underline" id="group_heading_id">Create New Group</h4>
     <br>
     <div class="row">
       <div class="input-field col s6 offset-s3">
@@ -15,8 +15,8 @@
       </div>
     </div>
     <div class="row">
-       <div class="input-field col s6 offset-s3">
-             <i class="material-icons prefix">search</i>
+       <div class="input-field col s6 offset-s3" >
+             <i class="material-icons prefix ">search</i>
              <input type="text" id="search_user_for_group" class="autocomplete white-text">
              <label for="search_user_for_group"> Add people </label>
        </div>
@@ -37,7 +37,9 @@
   $(document).ready(function(){
 
     var typed_users = {};
+    var typed_users_uuid = {};
     var user_dict = {};
+
 
     $.ajax({
          url: "/Get_All_Users/",
@@ -52,57 +54,67 @@
          },
        });
 
-      console.log($("#search_user_for_group").length);
       var instance = M.Autocomplete.getInstance($("#search_user_for_group"));
       instance.updateData(user_dict);
 
-        function add_user(){
+        function add_user(user_input,notify=true){
 
-           var user_input = $("#search_user_for_group").val();
            user_input = user_input.toLowerCase();
-          console.log(user_input);
 
           if(user_input.length == 0)
             return;
 
-            if(user_input in user_dict){
-                if(user_input in typed_users){
-                   M.toast({html:"User already added"});
-                   return;
-                }
-                typed_users[user_input] = 1;
-                M.toast({html:"User successfully added"});
-                $("#search_user_for_group").val("");
+          if(user_input in user_dict){
+              if(user_input in typed_users){
+                 if(notify)
+                    M.toast({html:"User already added"});
+                 return;
+              }
+              typed_users[user_input] = 1;
+              if(notify)
+                  M.toast({html:"User successfully added"});
 
-                var temp_html = '\  <div class="chip">\
-                    <img src="/static/MMSApp/images/yuna.jpg" alt="Contact Person">\
-                    '+user_input+'\
-                    <i class="close material-icons remove_user">close</i>\
-                    </div>';
-                $("#all_users_for_group").append(temp_html);
-                instance.close();
+              $("#search_user_for_group").val("");
 
-            }
-            else{
-               M.toast({html:"User doesn't exist"});
-            }
+              var temp_html = '\  <div class="chip">\
+                  <img src="/static/MMSApp/images/yuna.jpg" alt="Contact Person">\
+                  '+user_input+'\
+                  <i class="close material-icons remove_user">close</i>\
+                  </div>';
+              $("#all_users_for_group").append(temp_html);
+              instance.close();
+          }
+          else{
+            if(notify)
+              M.toast({html:"User doesn't exist"});
+          }
         }
 
         $("#add_user_btn_for_group").click(function(){
-          add_user();
-        })
-        $(document).on('keypress',function(e) {
+          var user_input = $("#search_user_for_group").val();
+          add_user(user_input);
+        });
+
+        $('#search_user_for_group').on('keypress',function(e) {
           if(e.which == 13) {
-              add_user();
+            var user_input = $("#search_user_for_group").val();
+            add_user(user_input);
           }
+        });
 
-        $(".remove_user").click(function(){
+      $(document).on("click", ".remove_user", function(){
+        var username = $(this).parent().text().replace("close","").trim();
+        delete typed_users[username];
+      })
 
-            var username = $(this).parent().text().replace("close","").trim();
-            delete typed_users[username];
-        })
-    });
 
+    function isEdit(){
+
+      var temp = window.location.pathname;
+      temp = temp.split("/")[1];
+      if(temp=='edit')
+       return true
+    }
 
 
   $("#submit_group_id").click(function(){
@@ -113,7 +125,27 @@
       M.toast({html: 'All inputs are compulsory'});
       return ;
     }
-
+    if(isEdit){
+      $.ajax({
+           url: "/Edit_Group_Submit/",
+           type: "POST",
+           data: {
+             'name' : $('#group_name_id').val()  ,
+             'uuid' : get_uuid(),
+             'members' : users_list,
+           },
+           success: function(response) {
+             if(response['status']==200){
+               M.toast({html: 'Group Edited successfully'});
+               location.reload(true);
+             }
+             else if(response['status']==409){
+               M.toast({html: 'Name Already taken'});
+             }
+           },
+         });
+    }
+    else{
     $.ajax({
          url: "/Create_Group_Submit/",
          type: "POST",
@@ -131,18 +163,36 @@
            }
          },
        });
+     }
      });
 
-     function isEdit(){
-
-       var temp = window.location.pathname;
-       temp = temp.split("/")[1];
-       if(temp=='edit')
-        return true
+     function get_uuid(){
+       uuid = window.location.pathname;
+       uuid = uuid.split("/")[3];
+       return uuid;
      }
 
      if(isEdit){
-       
+       $('#group_heading_id').text("Edit Group");
+       $('#submit_group_id').text("Update");
+
+       $.ajax({
+            url: "/Edit_Group_Details/",
+            type: "POST",
+            data: {
+              'uuid' : get_uuid()
+            },
+            success: function(response) {
+              if(response['status']==200){
+                for(var i=0;i<response['admins'].length;i++){
+                      add_user(response['admins'][i]['username'],false)
+                }
+                for(var i=0;i<response['members'].length;i++){
+                      add_user(response['members'][i]['username'],false)
+                }
+              }
+            },
+          });
      }
 
     });

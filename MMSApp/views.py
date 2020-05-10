@@ -21,6 +21,8 @@ from io import BytesIO
 from PIL import Image as IMage
 from django.core.files.uploadedfile import InMemoryUploadedFile
 
+import logging
+
 # 400 Bad Request
 # 401 Unauthorized
 # 403 Forbidden
@@ -68,6 +70,10 @@ def Create_Meeting(request):
 @login_required(login_url='/login/')
 def Single_Meeting(request):
     return render(request,'MMSApp/meeting_rd.html')
+
+@login_required(login_url='/login/')
+def Edit_Group(request, group_uuid):
+    return render(request,'MMSApp/group_cu.html')
 
 # API SECTION BELOW
 
@@ -164,11 +170,14 @@ class Get_All_UsersAPI(APIView):
             response['status'] = 200
 
         except Exception as e:
+            formatter = logging.Formatter('[%(asctime)s] p%(process)s {%(pathname)s:%(lineno)d} %(levelname)s - %(message)s','%m-%d %H:%M:%S')
+            print(formatter)
             print("ERROR IN Get_User_ListAPI", str(e))
 
         return Response(data=response)
 
 Get_All_Users = Get_All_UsersAPI.as_view()
+
 
 class Create_Group_SubmitAPI(APIView):
 
@@ -265,9 +274,7 @@ class Get_Group_DetailsAPI(APIView):
             user = request.user
 
             try:
-
                 try:
-
                     user = CustomUser.objects.get(username = user.username)
                     group = Group.objects.get(uuid = str(data['uuid']))
 
@@ -293,7 +300,9 @@ class Get_Group_DetailsAPI(APIView):
                     temp['dp'] = settings.MEDIA_URL + admin.dp.name
                     response['admins'].append(temp)
 
-                for member in group.members.all():
+                member_list = group.members.all()
+
+                for member in member_list:
                     if member not in admin_set:
                         temp = {}
                         temp['uuid'] = member.uuid
@@ -344,3 +353,117 @@ class Get_Group_DetailsAPI(APIView):
         return Response(data=response)
 
 Get_Group_Details = Get_Group_DetailsAPI.as_view()
+
+
+class Edit_Group_DetailsAPI(APIView):
+
+    authentication_classes = (CsrfExemptSessionAuthentication,BasicAuthentication)
+
+    def post(self, request, *args, **kwargs):
+        response = {}
+        response["status"] = 500
+
+        try:
+            data = request.data
+            user = request.user
+
+            try:
+                try:
+                    user = CustomUser.objects.get(username = user.username)
+                    group = Group.objects.get(uuid = str(data['uuid']))
+
+                except Exception as e:
+                    print(str(e))
+                    response['status'] = 404
+
+                response['name']   = group.name
+                response['admins'] = []
+                response['members'] = []
+
+                admin_set = set(group.admins.all())
+
+                for admin in admin_set:
+                    if user.username != admin.username:
+                        temp = {}
+                        temp['uuid'] = admin.uuid
+                        temp['username'] = admin.username
+                        temp['dp'] = settings.MEDIA_URL + admin.dp.name
+                        response['admins'].append(temp)
+
+                member_list = group.members.all()
+
+                for member in member_list:
+                    if (member not in admin_set) and (user.username != member.username):
+                        temp = {}
+                        temp['uuid'] = member.uuid
+                        temp['username'] = member.username
+                        temp['dp'] = settings.MEDIA_URL + member.dp.name
+                        response['members'].append(temp)
+
+                response['status']=200
+
+            except Exception as e:
+                response['status']=400
+                print(str(e))
+
+        except Exception as e:
+            formatter = logging.Formatter('[%(asctime)s] p%(process)s {%(pathname)s:%(lineno)d} %(levelname)s - %(message)s','%m-%d %H:%M:%S')
+            print(formatter)
+            print("ERROR IN Edit_Group_DetailsAPI", str(e))
+
+        return Response(data=response)
+
+Edit_Group_Details = Edit_Group_DetailsAPI.as_view()
+
+
+class Edit_Group_SubmitAPI(APIView):
+
+    authentication_classes = (CsrfExemptSessionAuthentication,BasicAuthentication)
+
+    def post(self, request, *args, **kwargs):
+        response = {}
+        response["status"] = 500
+
+        try:
+            data = request.data
+            user = request.user
+
+            user = CustomUser.objects.get(username = user.username)
+
+            group_id = str(data['uuid'])
+            group = Group.objects.get(uuid = group_id)
+
+            members = json.loads(data['members'])
+            admins = json.loads(data['admins'])
+
+            group.name = data['name']
+            group.members.all().delete()
+            group.admins.all().delete()
+
+            for member in members:
+                try:
+                    user_obj = CustomUser.objects.get(username = str(member))
+                    group.members.add(user_obj)
+                except Exception as e:
+                    print("error in ", str(e))
+
+            for admin in admins:
+                try:
+                    user_obj = CustomUser.objects.get(username = str(admin))
+                    group.admins.add(user_obj)
+                    group.members.add(user_obj)
+                except Exception as e:
+                    print("error in ", str(e))
+
+            group.save()
+            print("edited group saved")
+            response['status'] = 200
+
+        except Exception as e:
+            formatter = logging.Formatter('[%(asctime)s] p%(process)s {%(pathname)s:%(lineno)d} %(levelname)s - %(message)s','%m-%d %H:%M:%S')
+            print(formatter)
+            print("ERROR IN Edit_Group_SubmitAPI", str(e))
+
+        return Response(data=response)
+
+Edit_Group_Submit = Edit_Group_SubmitAPI.as_view()

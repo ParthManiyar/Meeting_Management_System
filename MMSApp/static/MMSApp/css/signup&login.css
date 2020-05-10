@@ -100,3 +100,11 @@
     margin-right: 0 !important; */
     margin-top: 0 !important;
   }
+
+  .heading{
+    font-size:2em;
+  }
+
+  .font-size-0.8{
+    font-size: 0.8em;
+  }
