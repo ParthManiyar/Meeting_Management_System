@@ -30,9 +30,12 @@
   <br>
   <button class="transparent-button"  id = "submit_group_id">Create</button>
   <br><br>
-  </div>
+</div>
 
 <script type="text/javascript">
+    
+  var members_list = {};
+  var admins_list = {};
 
   $(document).ready(function(){
 
@@ -57,7 +60,7 @@
       var instance = M.Autocomplete.getInstance($("#search_user_for_group"));
       instance.updateData(user_dict);
 
-        function add_user(user_input,notify=true){
+        function add_user(user_input,notify=true, is_admin=false){
 
            user_input = user_input.toLowerCase();
 
@@ -76,12 +79,24 @@
 
               $("#search_user_for_group").val("");
 
-              var temp_html = '\  <div class="chip">\
-                  <img src="/static/MMSApp/images/yuna.jpg" alt="Contact Person">\
-                  '+user_input+'\
-                  <i class="close material-icons remove_user">close</i>\
-                  </div>';
-              $("#all_users_for_group").append(temp_html);
+              if (is_admin){
+                var temp_html = '\  <div class="chip" style="background-color:#26A69A;" onclick="toggle_admin(this,\''+user_input+'\');">\
+                    <img src="/static/MMSApp/images/yuna.jpg" alt="Contact Person">\
+                    '+user_input+'\
+                    <i class="close material-icons remove_user">close</i>\
+                    </div>';
+                $("#all_users_for_group").append(temp_html);
+                admins_list[user_input]=1;
+              }
+              else{
+                var temp_html = '\  <div class="chip" onclick="toggle_admin(this,\''+user_input+'\');">\
+                    <img src="/static/MMSApp/images/yuna.jpg" alt="Contact Person">\
+                    '+user_input+'\
+                    <i class="close material-icons remove_user">close</i>\
+                    </div>';
+                $("#all_users_for_group").append(temp_html);
+                members_list[user_input]=1;
+              }
               instance.close();
           }
           else{
@@ -104,8 +119,11 @@
 
       $(document).on("click", ".remove_user", function(){
         var username = $(this).parent().text().replace("close","").trim();
+        delete admins_list[username];
+        delete members_list[username];
         delete typed_users[username];
       })
+
 
 
     function isEdit(){
@@ -113,35 +131,38 @@
       var temp = window.location.pathname;
       temp = temp.split("/")[1];
       if(temp=='edit')
-       return true
+       return true;
+      return false;
     }
 
 
   $("#submit_group_id").click(function(){
 
     users_list = JSON.stringify(typed_users);
-
-    if($('#group_name_id').val() == "" || users_list == ""){
+    members_list = JSON.stringify(members_list);
+    admins_list = JSON.stringify(admins_list);
+    console.log("this is users",members_list);
+    if($('#group_name_id').val() == "" || users_list==""){
       M.toast({html: 'All inputs are compulsory'});
       return ;
     }
-    if(isEdit){
+    if(isEdit()){
       $.ajax({
            url: "/Edit_Group_Submit/",
            type: "POST",
            data: {
              'name' : $('#group_name_id').val()  ,
              'uuid' : get_uuid(),
-             'members' : users_list,
+             'members' : members_list,
+             'admins' : admins_list,
            },
            success: function(response) {
              if(response['status']==200){
                M.toast({html: 'Group Edited successfully'});
-               location.reload(true);
+              //  window.location.pathname = "/groups/"+get_uuid();
              }
-             else if(response['status']==409){
-               M.toast({html: 'Name Already taken'});
-             }
+             else
+             M.toast({html: 'Some error occurred'});
            },
          });
     }
@@ -151,16 +172,17 @@
          type: "POST",
          data: {
            'name' : $('#group_name_id').val()  ,
-           'members' : users_list,
+           'members' : members_list,
+           'admins' : admins_list,
          },
          success: function(response) {
            if(response['status']==200){
              M.toast({html: 'Group Created successfully'});
-             location.reload(true);
+            //  window.location.pathname = "/home";
            }
-           else if(response['status']==409){
-             M.toast({html: 'Name Already taken'});
-           }
+           else
+             M.toast({html: 'Some error occurred'});
+           
          },
        });
      }
@@ -172,7 +194,7 @@
        return uuid;
      }
 
-     if(isEdit){
+     if(isEdit()){
        $('#group_heading_id').text("Edit Group");
        $('#submit_group_id').text("Update");
 
@@ -184,8 +206,9 @@
             },
             success: function(response) {
               if(response['status']==200){
+                $("#group_name_id").val(response['name']);
                 for(var i=0;i<response['admins'].length;i++){
-                      add_user(response['admins'][i]['username'],false)
+                      add_user(response['admins'][i]['username'],false,true)
                 }
                 for(var i=0;i<response['members'].length;i++){
                       add_user(response['members'][i]['username'],false)
@@ -198,6 +221,21 @@
     });
 
 
+    function toggle_admin(chip,uname){
+      console.log(uname);
+      var x = $(chip).css("backgroundColor");
+      if(x=="rgb(228, 228, 228)")
+      {
+        admins_list[uname] = 1;
+        delete members_list[uname];
+        $(chip).css('background-color','#26A69A');
+      }
+      else{
+        members_list[uname] = 1;
+        delete admins_list[uname];
+        $(chip).css('background-color','rgb(228, 228, 228)');
+      }
+    }
 </script>
 
 {% endblock %}

@@ -207,19 +207,30 @@ class Create_Group_SubmitAPI(APIView):
             user = CustomUser.objects.get(username = user.username)
 
             name = data['name']
-            members = json.loads(data['members'])
-
+            
             group = Group(name = name)
             group.uuid = str(uuid.uuid4())
             group.save()
             group.admins.add(user)
             group.members.add(user)
 
+            members = json.loads(data['members'])
+            admins = json.loads(data['admins'])
+
+            print(members)
+            print(admins)
+
             for member in members:
-                print(member)
                 try:
                     user_obj = CustomUser.objects.get(username = str(member))
-                    # print(user_obj)
+                    group.members.add(user_obj)
+                except Exception as e:
+                    print("error in ", str(e))
+
+            for admin in admins:
+                try:
+                    user_obj = CustomUser.objects.get(username = str(admin))
+                    group.admins.add(user_obj)
                     group.members.add(user_obj)
                 except Exception as e:
                     print("error in ", str(e))
@@ -453,8 +464,11 @@ class Edit_Group_SubmitAPI(APIView):
             admins = json.loads(data['admins'])
 
             group.name = data['name']
-            group.members.all().delete()
-            group.admins.all().delete()
+            group.members.clear()
+            group.admins.clear()
+
+            group.admins.add(user)
+            group.members.add(user)
 
             for member in members:
                 try:
