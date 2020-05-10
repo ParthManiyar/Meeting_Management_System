@@ -74,8 +74,8 @@
 
 .tabs .tab a{
       color:white;
-      background-color: grey;
-  } /*Black color to the text*/
+      background-color:  grey;
+  } /* lack color to the text*/
 
   .tabs .tab a:hover {
       background-color: grey;

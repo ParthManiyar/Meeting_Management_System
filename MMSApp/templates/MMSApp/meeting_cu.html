@@ -2,49 +2,51 @@
 {% block content %}
 {% load static %}
 
-    <div id="meeting_modal" class="modal fancyScrollreverse" >
-      <div class="modal-content" style="background-color:#003d72;color:white;overflow-y:auto">
-        <h4>Call a Meet</h4>
-        <br>
-        <p> Select a group </p>
-        <br>
+<br><br>
 
-        <div class="row">
-          <div class="input-field col s4 offset-s1">
-            <input  id="meeting_name" type="text" style="color:white">
-            <label for="meeting_name">Name</label>
-          </div>
-          <div class="input-field col s4 offset-s2">
-            <input  id="meeting_agenda" type="text" style="color:white">
-            <label for="meeting_agenda">Agenda</label>
-          </div>
-        </div>
-        <div class="row">
-          <div class="input-field col s4 offset-s1">
-            <input  id="meeting_venue" type="text" style="color:white">
-            <label for="meeting_venue">Venue</label>
-          </div>
-          <div class="input-field col s4 offset-s2">
-            <input class="datepicker" id="meeting_date" type="text" style="color:white">
-            <label for="meeting_date">Date</label>
-          </div>
-        </div>
-      <br>
+<div class="container center" style="background-color:#003d72;color:white;overflow-y:auto">
 
+      <h4 style="text-decoration:underline">Call a Meet</h4>
       <div class="row">
-        <div class="col s2 offset-s3">
-            <input placeholder="From" type="text" class="timepicker" id="meeting_from_time">
+        <div class="input-field col s4 offset-s1">
+          <i class="material-icons prefix">group</i>
+          <input  id="meeting_name" type="text" style="color:white">
+          <label for="meeting_name">Name</label>
         </div>
-        <div class="col s2 offset-s2">
-            <input placeholder="To" type="text" class="timepicker" id="meeting_to_time">
+        <div class="input-field col s4 offset-s2">
+          <i class="material-icons prefix">create</i>
+          <input  id="meeting_agenda" type="text" style="color:white">
+          <label for="meeting_agenda">Agenda</label>
         </div>
       </div>
+      <div class="row">
+        <div class="input-field col s4 offset-s1">
+          <i class="material-icons prefix">place</i>
+          <input  id="meeting_venue" type="text" style="color:white">
+          <label for="meeting_venue">Venue</label>
+        </div>
+        <div class="input-field col s4 offset-s2">
+          <i class="material-icons prefix">date_range</i>
+          <input class="datepicker" id="meeting_date" type="text" style="color:white">
+          <label for="meeting_date">Date</label>
+        </div>
+      </div>
+    <br>
 
+    <div class="row">
+      <div class="col s2 offset-s3">
+          <input placeholder="From" type="text" class="timepicker" id="meeting_from_time" style="color:white">
       </div>
-      <div class="modal-footer">
-        <a href="#!" class="modal-close waves-effect waves-green btn-flat">Call</a>
+      <div class="col s2 offset-s2">
+          <input placeholder="To" type="text" class="timepicker" id="meeting_to_time" style="color:white">
       </div>
     </div>
+
+    <div class="row">
+      <button class="transparent-button"  id = "submit_meeting_group_id">CALL</button>
+    </div>
+
+</div>
 
 
 {% endblock %}

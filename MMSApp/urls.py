@@ -21,5 +21,4 @@ urlpatterns = [
     path('Get_Group_Details/', views.Get_Group_Details),
     path('create/meeting/', views.Create_Meeting),
     path('meetings/<str:meeting_uuid>/', views.Single_Meeting),
-
 ]

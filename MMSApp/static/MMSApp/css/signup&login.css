@@ -74,12 +74,12 @@
 
 .tabs .tab a{
       color:white;
-      background-color: grey;
-  } /*Black color to the text*/
+      background-color:  #737373;
+  } /* lack color to the text*/
 
   .tabs .tab a:hover {
-      background-color: grey;
-      color:#003d72;
+      background-color:   #999999;
+      color:white;
   } /*Text color on hover*/
 
   .tabs .tab a.active {

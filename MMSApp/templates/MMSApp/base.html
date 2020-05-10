@@ -25,13 +25,17 @@
     <div class="nav-wrapper" style="background-color:#003d72">
       <a href="/home" class="brand-logo center">AUMMS</a>
       <ul id="nav-mobile" class="right hide-on-med-and-down" style="padding-right:10em;">
-        <li><a href="sass.html">Notifications</a></li>
+        <li><a href="#!">Notifications</a></li>
         <li><a href="/logout">Logout</a></li>
         <li style="padding-left:1em;">{{user.username}}
         </li>
       </ul>
     </div>
   </nav>
+
+  <div class="notification-popup black" style="width:200px;height:200px;z-index:10;position:absolute;overflow-y:auto;word-break: break-all;">
+    <span style="color:white">HEYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY</span>
+  </div>
 
     {% block content %}
     {% endblock %}

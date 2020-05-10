@@ -72,7 +72,7 @@ def Create_Meeting(request):
     return render(request,'MMSApp/meeting_cu.html')
 
 @login_required(login_url='/login/')
-def Single_Meeting(request):
+def Single_Meeting(request,meeting_uuid):
     return render(request,'MMSApp/meeting_rd.html')
 
 @login_required(login_url='/login/')
