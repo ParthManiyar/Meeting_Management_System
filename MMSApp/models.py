@@ -1,13 +1,16 @@
 from django.db import models
 from django.contrib.auth.models import User
-
+import uuid
 
 #########
+
+def get_uuid():
+    return str(uuid.uuid4())
 
 class Venue(models.Model):
 
     name = models.CharField(max_length=200)
-    uuid = models.CharField(max_length=100)
+    uuid = models.CharField(max_length=100,default = get_uuid(), editable=False)
     def __str__(self):
         return self.name
 
@@ -19,7 +22,7 @@ class Event(models.Model):
     end_time   = models.TimeField()
     name       = models.CharField(max_length=200)
     Venue      = models.ForeignKey(Venue, on_delete=models.CASCADE)
-    uuid = models.CharField(max_length=100)
+    uuid = models.CharField(max_length=100,default = get_uuid(), editable=False)
 
     def __str__(self):
         return self.name
@@ -30,19 +33,19 @@ class DailySchedule(models.Model):
 
     date   = models.DateField()
     events = models.ManyToManyField(Event)
-    uuid = models.CharField(max_length=100)
+    uuid = models.CharField(max_length=100,default = get_uuid(), editable=False)
 
     def __str__(self):
         return self.date
 #########
 
-class Schedule(models.Model):
+# class Schedule(models.Model):
 
-    daily_schedules = models.ManyToManyField(DailySchedule)
-    uuid = models.CharField(max_length=100)
+#     daily_schedules = models.ManyToManyField(DailySchedule)
+#     uuid = models.CharField(max_length=100)
 
-    def __str__(self):
-        return self.schedule_users.all()
+#     def __str__(self):
+#         return self.schedule_users.all()
 
 #########
 
@@ -52,8 +55,8 @@ class CustomUser(User):
         verbose_name = "CustomUser"
         verbose_name_plural = "CustomUsers"
 
-    schedule = models.ManyToManyField(Schedule,related_name="schedule_users")
-    uuid = models.CharField(max_length=100)
+    schedule = models.ManyToManyField(DailySchedule,related_name="schedule_users")
+    uuid = models.CharField(max_length=100,default = get_uuid(), editable=False)
     dp = models.ImageField(upload_to='',blank=True)
 
     def __str__(self):
@@ -71,7 +74,7 @@ class Message(models.Model):
     text   = models.CharField(max_length=1000)
     writer = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     time   = models.DateTimeField(auto_now=True)
-    uuid = models.CharField(max_length=100)
+    uuid = models.CharField(max_length=100,default = get_uuid(), editable=False)
 
     def __str__(self):
         return self.text
@@ -82,7 +85,7 @@ class ChatRoom(models.Model):
 
     name     = models.CharField(max_length=200,default="Chat room")
     messages = models.ManyToManyField(Message)
-    uuid = models.CharField(max_length=100)
+    uuid = models.CharField(max_length=100,default = get_uuid(), editable=False)
 
     def __str__(self):
         return self.name
@@ -94,7 +97,7 @@ class Resource(models.Model):
     rfile       = models.FileField()
     owner       = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     upload_time = models.DateTimeField(auto_now=True)
-    uuid = models.CharField(max_length=100)
+    uuid = models.CharField(max_length=100,default = get_uuid(), editable=False)
 
     def __str__(self):
         return self.rfile.name
@@ -115,7 +118,7 @@ class Meeting(models.Model):
     resources    = models.ManyToManyField(Resource)
     chatroom     = models.ForeignKey(ChatRoom, on_delete=models.CASCADE)
     created_date = models.DateTimeField()
-    uuid = models.CharField(max_length=100)
+    uuid = models.CharField(max_length=100,default = get_uuid(), editable=False)
 
     def __str__(self):
         return self.name
@@ -131,7 +134,7 @@ class Group(models.Model):
     members      = models.ManyToManyField(CustomUser,related_name="member")
     meetings     = models.ManyToManyField(Meeting,related_name="group")
     created_date = models.DateTimeField(auto_now=True)
-    uuid = models.CharField(max_length=100)
+    uuid = models.CharField(max_length=100,default = get_uuid(), editable=False)
 
     def __str__(self):
         return self.name
@@ -147,7 +150,7 @@ class Notification(models.Model):
     content      = models.CharField(max_length=300)
     isRead       = models.BooleanField(default = False)
     target_users = models.ManyToManyField(CustomUser,related_name="notif")
-    uuid = models.CharField(max_length=100)
+    uuid = models.CharField(max_length=100,default = get_uuid(), editable=False)
 
     def __str__(self):
         return self.title
