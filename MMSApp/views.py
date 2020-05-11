@@ -61,24 +61,28 @@ def Logout(request):
     return HttpResponseRedirect('/login/')
 
 @login_required(login_url='/login/')
-def Single_Group(request, group_uuid):
-    return render(request,'MMSApp/group_rd.html')
-
-@login_required(login_url='/login/')
 def Create_Group(request):
     return render(request,'MMSApp/group_cu.html')
 
 @login_required(login_url='/login/')
-def Create_Meeting(request):
+def Edit_Group(request, group_uuid):
+    return render(request,'MMSApp/group_cu.html')
+
+@login_required(login_url='/login/')
+def Single_Group(request, group_uuid):
+    return render(request,'MMSApp/group_rd.html')
+
+@login_required(login_url='/login/')
+def Create_Meeting(request,group_uuid):
+    return render(request,'MMSApp/meeting_cu.html')
+
+@login_required(login_url='/login/')
+def Edit_Meeting(request,meeting_uuid):
     return render(request,'MMSApp/meeting_cu.html')
 
 @login_required(login_url='/login/')
 def Single_Meeting(request,meeting_uuid):
     return render(request,'MMSApp/meeting_rd.html')
-
-@login_required(login_url='/login/')
-def Edit_Group(request, group_uuid):
-    return render(request,'MMSApp/group_cu.html')
 
 # LOGGER
 
@@ -516,7 +520,7 @@ class Create_Meeting_SubmitAPI(APIView):
             group = Group.objects.get(uuid = str(data['group_uuid']))
             chatroom    = ChatRoom(name=data['name'])
             chatroom.save()
-            
+
             m1 = Meeting()
 
             m1.name        = data['name']
@@ -528,11 +532,13 @@ class Create_Meeting_SubmitAPI(APIView):
             m1.duration    = int(data['duration'])
             m1.venue       = data['venue']
             m1.chatroom    = chatroom
-            # resources   
+            # resources
 
             m1.save()
-            # print(m1.start_time,m1.end_time)
-            
+            print(m1.start_time,m1.end_time)
+            if(m1.end_time >= m1.start_time):
+                print("correct")
+
             response['status']=200
         except Exception as e:
             error()

@@ -35,7 +35,7 @@
 
     <div class="row">
       <div class="col s2">
-          <a href="/create/meeting" id="new_meeting_button_id" class="waves-effect waves-light btn" ><i class="material-icons left">add</i>New</a>
+          <a href="#!" id="new_meeting_button_id" class="waves-effect waves-light btn" ><i class="material-icons left">add</i>New</a>
       </div>
     </div>
 
@@ -62,6 +62,8 @@
 
     uuid = window.location.pathname;
     uuid = uuid.split("/")[2];
+
+    $('#new_meeting_button_id').attr("href","/create/meeting/"+uuid);
 
     $('#edit_group_button_id').attr("href","/edit/group/"+uuid);
     // $('#leave_group_button_id').attr("href","/edit/group/"+uuid); // API LEFT-------------------------------

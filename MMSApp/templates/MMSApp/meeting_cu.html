@@ -50,17 +50,23 @@
 
 <script>
 
+  function get_uuid(){
+    uuid = window.location.pathname;
+    uuid = uuid.split("/")[3];
+    return uuid;
+  }
+
 $.ajax({
          url: "/Create_Meeting_Submit/",
          type: "POST",
          data: {
           'name':'ac',
           'agenda':'to tea,sdnmst',
-          's_hour':3,
+          's_hour':15,
           's_min':4,
-          'e_hour':4,
+          'e_hour':17,
           'e_min':5,
-          'group_uuid':'9dc3a98e-699f-423a-ad3a-b6845a5d9446',
+          'group_uuid':get_uuid(),
           'duration':3,
           'day':11,
           'month':1,

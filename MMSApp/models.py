@@ -126,7 +126,7 @@ class Meeting(models.Model):
     agenda       = models.CharField(max_length=500)
     group        = models.ForeignKey(Group,on_delete=models.CASCADE)
     attendees    = models.ManyToManyField(CustomUser,related_name="attendee")
-    meeting_date = models.DateField(blank=True)
+    meeting_date = models.DateField(blank=True,null=True)
     start_time   = models.DateTimeField(blank=True)
     end_time     = models.DateTimeField(blank=True)
     duration     = models.IntegerField(default=1) ##
