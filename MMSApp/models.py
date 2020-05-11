@@ -152,7 +152,6 @@ class Group(models.Model):
     def save(self, *args, **kwargs):
         if self.pk==None:
             self.uuid = get_uuid()
-            print(self.uuid)
         super(Group, self).save(*args, **kwargs)
 
 #########
@@ -182,7 +181,6 @@ class Meeting(models.Model):
     def save(self, *args, **kwargs):
         if self.pk==None:
             self.uuid = get_uuid()
-            print(self.uuid)
         super(Meeting, self).save(*args, **kwargs)
 #########
 

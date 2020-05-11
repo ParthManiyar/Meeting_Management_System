@@ -55,7 +55,7 @@
     uuid = uuid.split("/")[3];
     return uuid;
   }
-
+console.log(get_uuid());
 $.ajax({
          url: "/Create_Meeting_Submit/",
          type: "POST",
@@ -74,9 +74,40 @@ $.ajax({
           'venue':'clasasds 107',
          },
          success: function(response) {
+           console.log(response);
            if(response['status']==200){
+             var meeting_uuid = response['meeting_uuid'];
              M.toast({html: 'Meeting Created successfully'});
             //  window.location.pathname = "/home";
+                  $.ajax({
+              url: "/Edit_Meeting_Submit/",
+              type: "POST",
+              data: {
+                'meeting_uuid' : meeting_uuid,
+                'name':'ac 12',
+                'agenda':'not to tea,sdnmst',
+                's_hour':15,
+                's_min':4,
+                'e_hour':17,
+                'e_min':5,
+                'duration':3,
+                'day':11,
+                'month':1,
+                'year':2018,
+                'venue':'clasasds 107',
+              },
+              success: function(response) {
+                console.log(response);
+                if(response['status']==200){
+                  M.toast({html: 'Meeting Edited successfully'});
+                  //  window.location.pathname = "/home";
+                  
+                }
+                else
+                  M.toast({html: 'Some error occurred'});
+
+              },
+            });            
            }
            else
              M.toast({html: 'Some error occurred'});

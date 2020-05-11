@@ -517,6 +517,7 @@ class Create_Meeting_SubmitAPI(APIView):
             user = request.user
 
             user = CustomUser.objects.get(username = user.username)
+            print("the id",data['group_uuid'],"okay?")
             group = Group.objects.get(uuid = str(data['group_uuid']))
             chatroom    = ChatRoom(name=data['name'])
             chatroom.save()
@@ -541,7 +542,7 @@ class Create_Meeting_SubmitAPI(APIView):
             response['status']=200
         except Exception as e:
             error()
-            print("ERROR IN  = Create_Group_SubmitAPI", str(e))
+            print("ERROR IN  = Create_Meeting_SubmitAPI", str(e))
 
         return Response(data=response)
 
@@ -592,3 +593,41 @@ class Get_Meeting_DetailsAPI(APIView):
 Get_Meeting_Details = Get_Meeting_DetailsAPI.as_view()
 
 
+class Edit_Meeting_SubmitAPI(APIView):
+
+    authentication_classes = (CsrfExemptSessionAuthentication,BasicAuthentication)
+
+    def post(self, request, *args, **kwargs):
+        response = {}
+        response["status"] = 500
+
+        try:
+            data = request.data
+            user = request.user
+
+            user = CustomUser.objects.get(username = user.username)
+            
+            m1 = Meeting.objects.get(uuid = str(data['meeting_uuid']))
+
+            m1.name        = data['name']
+            m1.agenda      = data['agenda']
+            m1.start_time  = datetime(int(data['year']),int(data['month']),int(data['day']),int(data['s_hour']),int(data['s_min']))
+            m1.end_time    = datetime(int(data['year']),int(data['month']),int(data['day']),int(data['e_hour']),int(data['e_min']))
+            m1.meeting_date= date(int(data['year']),int(data['month']),int(data['day']))
+            m1.duration    = int(data['duration'])
+            m1.venue       = data['venue']
+            # resources
+
+            m1.save()
+            response['meeting_uuid'] = m1.uuid
+            response['name'] = m1.name
+            print(m1.start_time)
+
+            response['status']=200
+        except Exception as e:
+            error()
+            print("ERROR IN  = Edit_Meeting_SubmitAPI", str(e))
+
+        return Response(data=response)
+
+Edit_Meeting_Submit = Edit_Meeting_SubmitAPI.as_view()
