@@ -10,9 +10,14 @@ def get_uuid():
 class Venue(models.Model):
 
     name = models.CharField(max_length=200)
-    uuid = models.CharField(max_length=100,default = get_uuid(), editable=False)
+    uuid = models.CharField(max_length=100,default = "", editable=False)
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        if self.pk==None:
+            self.uuid == get_uuid()
+        super(Venue, self).save(*args, **kwargs)
 
 #########
 
@@ -22,10 +27,15 @@ class Event(models.Model):
     end_time   = models.TimeField()
     name       = models.CharField(max_length=200)
     venue      = models.CharField(max_length=200, default="N/A")
-    uuid = models.CharField(max_length=100,default = get_uuid(), editable=False)
+    uuid = models.CharField(max_length=100,default = "", editable=False)
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        if self.pk==None:
+            self.uuid == get_uuid()
+        super(Event, self).save(*args, **kwargs)
 
 #########
 
@@ -33,10 +43,15 @@ class DailySchedule(models.Model):
 
     date   = models.DateField()
     events = models.ManyToManyField(Event)
-    uuid = models.CharField(max_length=100,default = get_uuid(), editable=False)
+    uuid = models.CharField(max_length=100,default = "", editable=False)
 
     def __str__(self):
         return self.date
+
+    def save(self, *args, **kwargs):
+        if self.pk==None:
+            self.uuid == get_uuid()
+        super(DailySchedule, self).save(*args, **kwargs)
 #########
 
 # class Schedule(models.Model):
@@ -56,7 +71,7 @@ class CustomUser(User):
         verbose_name_plural = "CustomUsers"
 
     schedule = models.ManyToManyField(DailySchedule,related_name="schedule_users")
-    uuid = models.CharField(max_length=100,default = get_uuid(), editable=False)
+    uuid = models.CharField(max_length=100,default = "", editable=False)
     dp = models.ImageField(upload_to='',blank=True)
 
     def __str__(self):
@@ -65,6 +80,7 @@ class CustomUser(User):
     def save(self, *args, **kwargs):
         if self.pk==None:
             self.set_password(self.password)
+            self.uuid == get_uuid()
         super(CustomUser, self).save(*args, **kwargs)
 
 #########
@@ -74,10 +90,15 @@ class Message(models.Model):
     text   = models.CharField(max_length=1000)
     writer = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     time   = models.DateTimeField(auto_now=True)
-    uuid   = models.CharField(max_length=100,default = get_uuid(), editable=False)
+    uuid   = models.CharField(max_length=100,default = "", editable=False)
 
     def __str__(self):
         return self.text
+
+    def save(self, *args, **kwargs):
+        if self.pk==None:
+            self.uuid == get_uuid()
+        super(Message, self).save(*args, **kwargs)
 
 #########
 
@@ -85,10 +106,15 @@ class ChatRoom(models.Model):
 
     name     = models.CharField(max_length=200,default="Chat room")
     messages = models.ManyToManyField(Message)
-    uuid     = models.CharField(max_length=100,default = get_uuid(), editable=False)
+    uuid     = models.CharField(max_length=100,default = "", editable=False)
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        if self.pk==None:
+            self.uuid == get_uuid()
+        super(ChatRoom, self).save(*args, **kwargs)
 
 #########
 
@@ -97,10 +123,15 @@ class Resource(models.Model):
     rfile       = models.FileField()
     owner       = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     upload_time = models.DateTimeField(auto_now=True)
-    uuid = models.CharField(max_length=100,default = get_uuid(), editable=False)
+    uuid = models.CharField(max_length=100,default = "", editable=False)
 
     def __str__(self):
         return self.rfile.name
+
+    def save(self, *args, **kwargs):
+        if self.pk==None:
+            self.uuid == get_uuid()
+        super(Resource, self).save(*args, **kwargs)
 
 #########
 
@@ -110,13 +141,18 @@ class Group(models.Model):
     admins       = models.ManyToManyField(CustomUser,related_name="admin")
     members      = models.ManyToManyField(CustomUser,related_name="member")
     created_date = models.DateTimeField(auto_now=True)
-    uuid = models.CharField(max_length=100,default = get_uuid(), editable=False)
+    uuid = models.CharField(max_length=100,default = "", editable=False)
 
     def __str__(self):
         return self.name
 
     def get_created_date(self):
         return self.created_date.strftime('%B %d %Y')
+
+    def save(self, *args, **kwargs):
+        if self.pk==None:
+            self.uuid == get_uuid()
+        super(Group, self).save(*args, **kwargs)
 
 #########
 
@@ -134,13 +170,18 @@ class Meeting(models.Model):
     resources    = models.ManyToManyField(Resource)
     chatroom     = models.ForeignKey(ChatRoom, on_delete=models.CASCADE)
     created_date = models.DateTimeField(auto_now=True)
-    uuid = models.CharField(max_length=100,default = get_uuid(), editable=False)
+    uuid = models.CharField(max_length=100,default = "", editable=False)
 
     def __str__(self):
         return self.name
 
     def get_time(self):
         return self.start_time.strftime('%B %d %Y')
+
+    def save(self, *args, **kwargs):
+        if self.pk==None:
+            self.uuid == get_uuid()
+        super(Meeting, self).save(*args, **kwargs)
 #########
 
 
@@ -150,7 +191,12 @@ class Notification(models.Model):
     content      = models.CharField(max_length=300)
     isRead       = models.BooleanField(default = False)
     target_users = models.ManyToManyField(CustomUser,related_name="notif")
-    uuid = models.CharField(max_length=100,default = get_uuid(), editable=False)
+    uuid = models.CharField(max_length=100,default="", editable=False)
 
     def __str__(self):
         return self.title
+
+    def save(self, *args, **kwargs):
+        if self.pk==None:
+            self.uuid == get_uuid()
+        super(Notification, self).save(*args, **kwargs)
