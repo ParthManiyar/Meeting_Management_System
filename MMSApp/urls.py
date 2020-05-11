@@ -27,4 +27,5 @@ urlpatterns = [
     path('edit/meeting/<str:meeting_uuid>/', views.Edit_Meeting),
     path('Create_Meeting_Submit/',views.Create_Meeting_Submit),
     path('meetings/<str:meeting_uuid>/', views.Single_Meeting),
+    path('Get_Meeting_Details/',views.Get_Meeting_Details),
 ]

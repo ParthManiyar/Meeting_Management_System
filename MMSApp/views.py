@@ -344,9 +344,9 @@ class Get_Group_DetailsAPI(APIView):
                 if user in admin_set:
                     response['isAdmin'] = "1"
 
-                past_meets = group.meeting_set.all().filter(end_time__lte = localtime())
-                ongoing = group.meeting_set.all().filter(start_time__lte = localtime(), end_time__gte = localtime())
-                upcoming = group.meeting_set.all().filter(start_time__gte = localtime())
+                past_meets = group.meeting_set.all().filter(end_time__lte = datetime.now())
+                ongoing = group.meeting_set.all().filter(start_time__lte = datetime.now(), end_time__gte = datetime.now())
+                upcoming = group.meeting_set.all().filter(start_time__gte = datetime.now())
 
                 for meet in past_meets:
                     temp = {}
@@ -535,9 +535,8 @@ class Create_Meeting_SubmitAPI(APIView):
             # resources
 
             m1.save()
-            print(m1.start_time,m1.end_time)
-            if(m1.end_time >= m1.start_time):
-                print("correct")
+            response['meeting_uuid'] = m1.uuid
+            print(m1.start_time)
 
             response['status']=200
         except Exception as e:
@@ -547,3 +546,49 @@ class Create_Meeting_SubmitAPI(APIView):
         return Response(data=response)
 
 Create_Meeting_Submit = Create_Meeting_SubmitAPI.as_view()
+
+
+
+class Get_Meeting_DetailsAPI(APIView):
+
+    authentication_classes = (CsrfExemptSessionAuthentication,BasicAuthentication)
+
+    def post(self, request, *args, **kwargs):
+        response = {}
+        response["status"] = 500
+
+        try:
+            data = request.data
+            user = request.user
+
+            user = CustomUser.objects.get(username = user.username)
+            meet = Meeting.objects.get(uuid = data['meeting_uuid'])
+            
+            response['name'] = meet.name
+            response['agenda'] = meet.agenda
+            response['start_time']=[]
+            response['end_time']=[]
+            response['meeting_date']=[]
+            response['duration']=meet.duration
+            response['venue']=meet.venue
+
+            response['start_time'].append(meet.start_time.hour)
+            response['start_time'].append(meet.start_time.minute)
+
+            response['end_time'].append(meet.end_time.hour)
+            response['end_time'].append(meet.end_time.minute)
+
+            response['meeting_date'].append(meet.meeting_date.day)
+            response['meeting_date'].append(meet.meeting_date.month)
+            response['meeting_date'].append(meet.meeting_date.year)
+
+            response['status']=200
+        except Exception as e:
+            error()
+            print("ERROR IN  = Get_Meeting_Details", str(e))
+
+        return Response(data=response)
+
+Get_Meeting_Details = Get_Meeting_DetailsAPI.as_view()
+
+
