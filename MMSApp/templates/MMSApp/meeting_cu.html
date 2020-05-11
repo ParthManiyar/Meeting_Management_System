@@ -6,7 +6,8 @@
 
 <div class="container center" style="background-color:#003d72;color:white;overflow-y:auto">
 
-      <h4 style="text-decoration:underline">Call a Meet</h4>
+      <h4 style="text-decoration:underline" id="call_a_meet_id">Call a Meet</h4>
+      <br>
       <div class="row">
         <div class="input-field col s4 offset-s1">
           <i class="material-icons prefix">group</i>
@@ -50,6 +51,8 @@
 
 <script>
 
+$(document).ready(function(){
+
   month_dict = {
     'Jan':1,
     'Feb':2,
@@ -65,16 +68,68 @@
     'Dec':12,
   };
 
+  rev_dict = {
+    1:'Jan',
+    2:'Feb',
+    3:'Mar',
+    4:'Apr',
+    5:'May',
+    6:'Jun',
+    7:'Jul',
+    8:'Aug',
+    9:'Sep',
+    10:'Oct',
+    11:'Nov',
+    12:'Dec',
+  };
+
   function get_uuid(){
     uuid = window.location.pathname;
     uuid = uuid.split("/")[3];
     return uuid;
   }
 
+  function isEdit(){
+
+    var temp = window.location.pathname;
+    temp = temp.split("/")[1];
+    if(temp=='edit')
+     return true;
+    return false;
+  }
+
+  function to12hrString(x,y) {
+
+    var am_pm = "AM";
+
+    if(x>=12)
+      am_pm = "PM";
+
+    if(x==0)
+      x+=12;
+    else if(x>12)
+        x-=12;
+
+    if(x.toString().length == 1){
+      x = "0" + x.toString();
+    }
+    if(y.toString().length == 1){
+      y = "0" + y.toString();
+    }
+
+    return x+":"+y+" "+am_pm;
+  }
+
   function get_time_h(x) {
    var h = parseInt(parseInt(x[0])*10+ parseInt(x[1]));
-    if(x[6]=="P")
-      h+=parseInt(12);
+     if(h==12){
+       if(x[6]=="A")
+          h-=parseInt(12);
+     }
+     else{
+       if(x[6]=="P")
+        h+=parseInt(12);
+      }
     return h;
   }
 
@@ -98,12 +153,14 @@
   }
 
   function get_month(x){
+    console.log(x);
     y = "";
     for (var i=0;i<x.length;i++){
       if(x[i] == " ")
         break;
       y += x[i];
     }
+    console.log(y);
     return month_dict[y].toString();
   }
 
@@ -134,40 +191,123 @@ $( "#meeting_from_time_id" ).keydown(false);
      }
 
      var instance = M.Datepicker.getInstance(meeting_date_id);
+     var ins_string = instance.toString();
 
-     day = get_day(instance.toString());
-     month = get_month(instance.toString());
-     year = get_year(instance.toString());
+     if(ins_string == "")
+        ins_string = $("#meeting_date_id").val()
 
-    // $.ajax({
-    //          url: "/Create_Meeting_Submit/",
-    //          type: "POST",
-    //          data: {
-    //           'name':'ac',
-    //           'agenda':'to tea,sdnmst',
-    //           's_hour':15,
-    //           's_min':4,
-    //           'e_hour':17,
-    //           'e_min':5,
-    //           'group_uuid':get_uuid(),
-    //           'duration':3,
-    //           'day':11,
-    //           'month':1,
-    //           'year':2018,
-    //           'venue':'clasasds 107',
-    //          },
-    //          success: function(response) {
-    //            if(response['status']==200){
-    //              M.toast({html: 'Meeting Created successfully'});
-    //             //  window.location.pathname = "/home";
-    //            }
-    //            else
-    //              M.toast({html: 'Some error occurred'});
-    //
-    //          },
-    //        });
+     day = get_day(ins_string);
+     month = get_month(ins_string);
+     year = get_year(ins_string);
+
+     console.log(day);
+     console.log(month);
+     console.log(year);
+
+     console.log(s_hour);
+     console.log(s_min);
+
+     console.log(e_hour);
+     console.log(e_min);
+
+
+
+     if(isEdit){
+       $.ajax({
+            url: "/Edit_Meeting_Submit/",
+            type: "POST",
+            data: {
+             'uuid':get_uuid(),
+             'name':$("#meeting_name_id").val(),
+             'agenda':$("#meeting_agenda_id").val(),
+             's_hour':s_hour,
+             's_min':s_min,
+             'e_hour':e_hour,
+             'e_min':e_min,
+             'group_uuid':get_uuid(),
+             'duration':duration,
+             'day':day,
+             'month':month,
+             'year':year,
+             'venue':$("#meeting_venue_id").val(),
+            },
+            success: function(response) {
+              if(response['status']==200){
+                M.toast({html: 'Meeting Updated successfully'});
+                window.location.pathname = "/meetings/"+response['meeting_uuid'];
+              }
+              else
+                M.toast({html: 'Some error occurred'});
+            },
+          });
+     }
+     else{
+        $.ajax({
+             url: "/Create_Meeting_Submit/",
+             type: "POST",
+             data: {
+              'name':$("#meeting_name_id").val(),
+              'agenda':$("#meeting_agenda_id").val(),
+              's_hour':s_hour,
+              's_min':s_min,
+              'e_hour':e_hour,
+              'e_min':e_min,
+              'group_uuid':get_uuid(),
+              'duration':duration,
+              'day':day,
+              'month':month,
+              'year':year,
+              'venue':$("#meeting_venue_id").val(),
+             },
+             success: function(response) {
+               if(response['status']==200){
+                 M.toast({html: 'Meeting Created successfully'});
+                 window.location.pathname = "/meetings/"+response['meeting_uuid'];
+               }
+               else
+                 M.toast({html: 'Some error occurred'});
+             },
+           });
+         }
   });
 
+    if(isEdit){
+
+      $("#call_a_meet_id").text("Update a Meeting");
+      $("#submit_meeting_id").text("UPDATE");
+
+      $.ajax({
+               url: "/Get_Meeting_Details/",
+               type: "POST",
+               data: {
+                  'uuid' : get_uuid(),
+               },
+               success: function(response) {
+                 if(response['status']==200){
+                   $("#meeting_name_id").val(response['name']);
+                   $("#meeting_agenda_id").val(response['agenda']);
+                   $("#meeting_venue_id").val(response['venue']);
+
+                   var to12hrStringval = to12hrString(response['start_time'][0],response['start_time'][1]);
+
+                   $("#meeting_from_time_id").val(to12hrStringval);
+
+                   to12hrStringval = to12hrString(response['end_time'][0],response['end_time'][1]);
+
+                   $("#meeting_to_time_id").val(to12hrStringval);
+
+                   var month = parseInt(response['meeting_date'][1]);
+                   var day = (response['meeting_date'][0]).toString();
+                   if(day.length==1)
+                    day = "0"+day;
+                   $("#meeting_date_id").val(rev_dict[month]+" "+day+", "+response['meeting_date'][2]);
+                   M.updateTextFields();
+                 }
+               },
+             });
+    }
+
+});
 
 </script>
 {% endblock %}

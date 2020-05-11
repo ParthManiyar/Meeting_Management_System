@@ -64,4 +64,17 @@
 
 </div>
 
+
+<script type="text/javascript">
+
+  function get_uuid(){
+    uuid = window.location.pathname;
+    uuid = uuid.split("/")[2];
+    return uuid;
+  }
+
+  $("#edit_meeting_button_id").attr("href","/edit/meeting/"+get_uuid());
+
+</script>
+
 {% endblock %}

@@ -563,8 +563,8 @@ class Get_Meeting_DetailsAPI(APIView):
             user = request.user
 
             user = CustomUser.objects.get(username = user.username)
-            meet = Meeting.objects.get(uuid = data['meeting_uuid'])
-            
+            meet = Meeting.objects.get(uuid = data['uuid'])
+
             response['name'] = meet.name
             response['agenda'] = meet.agenda
             response['start_time']=[]
@@ -582,6 +582,8 @@ class Get_Meeting_DetailsAPI(APIView):
             response['meeting_date'].append(meet.meeting_date.day)
             response['meeting_date'].append(meet.meeting_date.month)
             response['meeting_date'].append(meet.meeting_date.year)
+
+            print(response['meeting_date'])
 
             response['status']=200
         except Exception as e:
@@ -606,8 +608,8 @@ class Edit_Meeting_SubmitAPI(APIView):
             user = request.user
 
             user = CustomUser.objects.get(username = user.username)
-            
-            m1 = Meeting.objects.get(uuid = str(data['meeting_uuid']))
+
+            m1 = Meeting.objects.get(uuid = str(data['uuid']))
 
             m1.name        = data['name']
             m1.agenda      = data['agenda']
