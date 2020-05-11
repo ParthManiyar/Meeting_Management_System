@@ -16,8 +16,8 @@
 <div class="row" style="padding-right:0px;margin-right:0px">
   <div class="col s12" style="padding-left:0px;padding-right:0px">
     <ul class="tabs" style="background-color:#003d72;" >
-      <li class="tab col s3"><a href="#info_tab_id" >INFO</a></li>
-      <li class="tab col s3"><a class="active" href="#attendees_tab_id">ATTENDEES</a></li>
+      <li class="tab col s3 active"><a href="#info_tab_id" >INFO</a></li>
+      <li class="tab col s3"><a href="#attendees_tab_id">ATTENDEES</a></li>
       <li class="tab col s3"><a href="#chat_tab_id" >CHAT</a></li>
       <li class="tab col s3"><a href="#resources_tab_id" >RESOURCES</a></li>
     </ul>
@@ -25,18 +25,41 @@
 </div>
 
 <div id="info_tab_id">
-<div class="row">
-  HEY
-</div>
+  <div class="fancyScroll" style="max-height:500px;overflow-y:auto">
+    <p><span class="grey-text">Group:</span> XYZ </p>
+    <p><span class="grey-text">Date:</span> XYZ </p>
+    <p><span class="grey-text">Start time:</span> XYZ  </p>
+    <p><span class="grey-text">End time:</span>  XYZ</p>
+  </div>
 </div>
 <div id="attendees_tab_id">
-HEY2
+  <div class="fancyScroll" style="max-height:500px;overflow-y:auto">
+      <p><a href="/profile/">XYZ</a></p>
+      <p><a href="/profile/">XYZ</a></p>
+  </div>
 </div>
 <div id="chat_tab_id">
-HEY3
+  <div class="fancyScroll" style="height:500px;overflow-y:auto">
+
+  </div>
 </div>
 <div id="resources_tab_id">
-HEY4
+    <div class = "row">
+       <div class = "file-field input-field col s3">
+          <div class = "btn">
+             <span>Browse</span>
+             <input id="add_file_button_id" type = "file" multiple />
+          </div>
+          <div class = "file-path-wrapper">
+             <input class = "file-path validate" type = "text"
+                placeholder = "Upload files" />
+          </div>
+       </div>
+    </div>
+  <div class="fancyScroll" style="max-height:400px;overflow-y:auto">
+    <p><a href="files/">XYZ</a></p>
+    <p><a href="files/">XYZ</a></p>
+  </div>
 </div>
 
 </div>

@@ -25,17 +25,42 @@
     <div class="nav-wrapper" style="background-color:#003d72">
       <a href="/home" class="brand-logo center">AUMMS</a>
       <ul id="nav-mobile" class="right hide-on-med-and-down" style="padding-right:10em;">
-        <li><a href="#!">Notifications</a></li>
-        <li><a href="/logout">Logout</a></li>
+        <li>
+          <a href="#!" id="notification_id" class="valign-wrapper">
+            <i class="material-icons right">notifications</i>
+            <span class="new badge" >4</span>
+          </a>
+        </li>
+        <li><a href="/logout"><i class="material-icons right">exit_to_app</i>Logout</a></li>
         <li style="padding-left:1em;">{{user.username}}
         </li>
       </ul>
     </div>
   </nav>
 
-  <div class="notification-popup black" style="width:200px;height:200px;z-index:10;position:absolute;overflow-y:auto;word-break: break-all;">
-    <span style="color:white">HEYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY</span>
+  <div id="notification-popup" class="fancyScroll" state="off" >
+    <div class="notification-element">
+      HEY
+    </div>
+    <hr style="margin:0px">
+    <div class="valign-wrapper notification-element">
+      HEY
+    </div>
+    <hr style="margin:0px">
   </div>
+
+  <script type="text/javascript">
+    $("#notification_id").click(function (){
+      if($('#notification-popup').attr('state')=='off'){
+        $('#notification-popup').show();
+        $('#notification-popup').attr('state','on');
+      }
+      else{
+        $('#notification-popup').hide();
+        $('#notification-popup').attr('state','off');
+      }
+    });
+  </script>
 
     {% block content %}
     {% endblock %}

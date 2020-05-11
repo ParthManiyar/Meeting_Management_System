@@ -207,7 +207,7 @@ class Create_Group_SubmitAPI(APIView):
             user = CustomUser.objects.get(username = user.username)
 
             name = data['name']
-            
+
             group = Group(name = name)
             group.uuid = str(uuid.uuid4())
             group.save()

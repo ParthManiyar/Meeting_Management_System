@@ -48,5 +48,24 @@
 
 </div>
 
+<script type="text/javascript">
+
+    $(document).ready(function(){
+      $.ajax({
+           url: "/Get_All_Users/",
+           type: "POST",
+           async: false,
+           data: {
+           },
+           success: function(response) {
+             if(response['status']==200){
+               user_dict = response['users'];
+             }
+           },
+         });
+    });
+
+</script>
+
 
 {% endblock %}
