@@ -49,6 +49,17 @@
       </div>
     </div>
 
+    <div id="ongoing_tab_id">
+      HEY1
+    </div>
+    <div id="upcoming_tab_id">
+      HEY2
+    </div>
+    <div id="past_tab_id">
+      HEY3
+    </div>
+
+
     <div class="fancyScroll" style="height:500px;overflow-y:auto;">
 
     </div>
@@ -103,7 +114,7 @@
               </div><hr>';
             }
             $("#member_list_id").append(temp);
-            if(response['isAdmin'])
+            if(response['isAdmin']=="1")
               jQuery('#edit_group_button_id').show()
           }
         },

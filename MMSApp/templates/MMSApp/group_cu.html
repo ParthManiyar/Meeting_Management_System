@@ -24,8 +24,8 @@
          <button class="transparent-button" id="add_user_btn_for_group">Add</button>
       </div>
     </div>
-  <br>
   <div class="row" id="all_users_for_group">
+    <p style="font-size:0.9em;color:grey"> Click on user to make admin </p>
   </div>
   <br>
   <button class="transparent-button"  id = "submit_group_id">Create</button>
@@ -80,8 +80,8 @@
               $("#search_user_for_group").val("");
 
               if (is_admin){
-                var temp_html = '\  <div class="chip" style="background-color:#26A69A;" onclick="toggle_admin(this,\''+user_input+'\');">\
-                    <img src="/static/MMSApp/images/yuna.jpg" alt="Contact Person">\
+                var temp_html = '\  <div class="chip" style="background-color:#26A69A;cursor:pointer" onclick="toggle_admin(this,\''+user_input+'\');">\
+                    <img src="'+user_dict[user_input]+'" alt="Contact Person">\
                     '+user_input+'\
                     <i class="close material-icons remove_user">close</i>\
                     </div>';
@@ -89,8 +89,8 @@
                 admins_list[user_input]=1;
               }
               else{
-                var temp_html = '\  <div class="chip" onclick="toggle_admin(this,\''+user_input+'\');">\
-                    <img src="/static/MMSApp/images/yuna.jpg" alt="Contact Person">\
+                var temp_html = '\  <div class="chip" style="cursor:pointer" onclick="toggle_admin(this,\''+user_input+'\');">\
+                    <img src="'+user_dict[user_input]+'" alt="Contact Person">\
                     '+user_input+'\
                     <i class="close material-icons remove_user">close</i>\
                     </div>';
@@ -141,7 +141,7 @@
     users_list = JSON.stringify(typed_users);
     members_list = JSON.stringify(members_list);
     admins_list = JSON.stringify(admins_list);
-    console.log("this is users",members_list);
+
     if($('#group_name_id').val() == "" || users_list==""){
       M.toast({html: 'All inputs are compulsory'});
       return ;
@@ -213,16 +213,15 @@
                 for(var i=0;i<response['members'].length;i++){
                       add_user(response['members'][i]['username'],false)
                 }
+                M.updateTextFields();
               }
             },
           });
      }
-
-    });
-
+});
 
     function toggle_admin(chip,uname){
-      console.log(uname);
+
       var x = $(chip).css("backgroundColor");
       if(x=="rgb(228, 228, 228)")
       {
@@ -236,6 +235,8 @@
         $(chip).css('background-color','rgb(228, 228, 228)');
       }
     }
+
+
 </script>
 
 {% endblock %}

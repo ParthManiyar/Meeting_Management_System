@@ -212,19 +212,18 @@ $( "#meeting_from_time_id" ).keydown(false);
 
 
 
-     if(isEdit){
+     if(isEdit()){
        $.ajax({
             url: "/Edit_Meeting_Submit/",
             type: "POST",
             data: {
-             'uuid':get_uuid(),
              'name':$("#meeting_name_id").val(),
              'agenda':$("#meeting_agenda_id").val(),
              's_hour':s_hour,
              's_min':s_min,
              'e_hour':e_hour,
              'e_min':e_min,
-             'group_uuid':get_uuid(),
+             'meeting_uuid':get_uuid(),
              'duration':duration,
              'day':day,
              'month':month,
@@ -271,7 +270,7 @@ $( "#meeting_from_time_id" ).keydown(false);
          }
   });
 
-    if(isEdit){
+    if(isEdit()){
 
       $("#call_a_meet_id").text("Update a Meeting");
       $("#submit_meeting_id").text("UPDATE");
@@ -280,7 +279,7 @@ $( "#meeting_from_time_id" ).keydown(false);
                url: "/Get_Meeting_Details/",
                type: "POST",
                data: {
-                  'uuid' : get_uuid(),
+                  'meeting_uuid' : get_uuid(),
                },
                success: function(response) {
                  if(response['status']==200){

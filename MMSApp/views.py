@@ -184,7 +184,7 @@ class Get_All_UsersAPI(APIView):
 
             for u in users:
                 if u.username != user.username:
-                    response['users'][u.username] = settings.MEDIA_ROOT+u.dp.name
+                    response['users'][u.username] = settings.MEDIA_URL+u.dp.name
 
             response['status'] = 200
 
@@ -222,9 +222,6 @@ class Create_Group_SubmitAPI(APIView):
             members = json.loads(data['members'])
             admins = json.loads(data['admins'])
 
-            print(members)
-            print(admins)
-
             for member in members:
                 try:
                     user_obj = CustomUser.objects.get(username = str(member))
@@ -241,7 +238,6 @@ class Create_Group_SubmitAPI(APIView):
                     print("error in ", str(e))
 
             group.save()
-            print("group saved")
             response['status'] = 200
 
         except Exception as e:
@@ -281,7 +277,7 @@ class Get_User_GroupsAPI(APIView):
                 response['status']=200
 
             except Exception as e:
-                response['status']=200
+                error()
                 print(str(e))
         except Exception as e:
             error()
@@ -310,6 +306,7 @@ class Get_Group_DetailsAPI(APIView):
                     group = Group.objects.get(uuid = str(data['uuid']))
 
                 except Exception as e:
+                    error()
                     print(str(e))
                     response['status'] = 404
 
@@ -405,6 +402,7 @@ class Edit_Group_DetailsAPI(APIView):
                     group = Group.objects.get(uuid = str(data['uuid']))
 
                 except Exception as e:
+                    error()
                     print(str(e))
                     response['status'] = 404
 
@@ -435,12 +433,12 @@ class Edit_Group_DetailsAPI(APIView):
                 response['status']=200
 
             except Exception as e:
+                error()
                 response['status']=400
                 print(str(e))
 
         except Exception as e:
-            formatter = logging.Formatter('[%(asctime)s] p%(process)s {%(pathname)s:%(lineno)d} %(levelname)s - %(message)s','%m-%d %H:%M:%S')
-            print(formatter)
+            error()
             print("ERROR IN Edit_Group_DetailsAPI", str(e))
 
         return Response(data=response)
@@ -480,6 +478,7 @@ class Edit_Group_SubmitAPI(APIView):
                     user_obj = CustomUser.objects.get(username = str(member))
                     group.members.add(user_obj)
                 except Exception as e:
+                    error()
                     print("error in ", str(e))
 
             for admin in admins:
@@ -488,10 +487,10 @@ class Edit_Group_SubmitAPI(APIView):
                     group.admins.add(user_obj)
                     group.members.add(user_obj)
                 except Exception as e:
+                    error()
                     print("error in ", str(e))
 
             group.save()
-            print("edited group saved")
             response['status'] = 200
 
         except Exception as e:
@@ -517,7 +516,6 @@ class Create_Meeting_SubmitAPI(APIView):
             user = request.user
 
             user = CustomUser.objects.get(username = user.username)
-            print("the id",data['group_uuid'],"okay?")
             group = Group.objects.get(uuid = str(data['group_uuid']))
             chatroom    = ChatRoom(name=data['name'])
             chatroom.save()
@@ -563,7 +561,7 @@ class Get_Meeting_DetailsAPI(APIView):
             user = request.user
 
             user = CustomUser.objects.get(username = user.username)
-            meet = Meeting.objects.get(uuid = data['uuid'])
+            meet = Meeting.objects.get(uuid = data['meeting_uuid'])
 
             response['name'] = meet.name
             response['agenda'] = meet.agenda
@@ -609,7 +607,7 @@ class Edit_Meeting_SubmitAPI(APIView):
 
             user = CustomUser.objects.get(username = user.username)
 
-            m1 = Meeting.objects.get(uuid = str(data['uuid']))
+            m1 = Meeting.objects.get(uuid = str(data['meeting_uuid']))
 
             m1.name        = data['name']
             m1.agenda      = data['agenda']
