@@ -10,45 +10,60 @@
       <div class="row">
         <div class="input-field col s4 offset-s1">
           <i class="material-icons prefix">group</i>
-          <input  id="meeting_name" type="text" style="color:white">
-          <label for="meeting_name">Name</label>
+          <input  id="meeting_name_id" type="text" style="color:white">
+          <label for="meeting_name_id">Name</label>
         </div>
         <div class="input-field col s4 offset-s2">
           <i class="material-icons prefix">create</i>
-          <input  id="meeting_agenda" type="text" style="color:white">
-          <label for="meeting_agenda">Agenda</label>
+          <input  id="meeting_agenda_id" type="text" style="color:white">
+          <label for="meeting_agenda_id">Agenda</label>
         </div>
       </div>
       <div class="row">
         <div class="input-field col s4 offset-s1">
           <i class="material-icons prefix">place</i>
-          <input  id="meeting_venue" type="text" style="color:white">
-          <label for="meeting_venue">Venue</label>
+          <input  id="meeting_venue_id" type="text" style="color:white">
+          <label for="meeting_venue_id">Venue</label>
         </div>
         <div class="input-field col s4 offset-s2">
           <i class="material-icons prefix">date_range</i>
-          <input class="datepicker" id="meeting_date" type="text" style="color:white">
-          <label for="meeting_date">Date</label>
+          <input class="datepicker" id="meeting_date_id" type="text" style="color:white">
+          <label for="meeting_date_id">Date</label>
         </div>
       </div>
     <br>
 
     <div class="row">
       <div class="col s2 offset-s3">
-          <input placeholder="From" type="text" class="timepicker" id="meeting_from_time" style="color:white">
+          <input placeholder="From" type="text" class="timepicker" id="meeting_from_time_id" style="color:white">
       </div>
       <div class="col s2 offset-s2">
-          <input placeholder="To" type="text" class="timepicker" id="meeting_to_time" style="color:white">
+          <input placeholder="To" type="text" class="timepicker" id="meeting_to_time_id" style="color:white">
       </div>
     </div>
 
     <div class="row">
-      <button class="transparent-button"  id = "submit_meeting_group_id">CALL</button>
+      <button class="transparent-button"  id = "submit_meeting_id">CALL</button>
     </div>
 
 </div>
 
 <script>
+
+  month_dict = {
+    'Jan':1,
+    'Feb':2,
+    'Mar':3,
+    'Apr':4,
+    'May':5,
+    'Jun':6,
+    'Jul':7,
+    'Aug':8,
+    'Sep':9,
+    'Oct':10,
+    'Nov':11,
+    'Dec':12,
+  };
 
   function get_uuid(){
     uuid = window.location.pathname;
@@ -56,33 +71,103 @@
     return uuid;
   }
 
-$.ajax({
-         url: "/Create_Meeting_Submit/",
-         type: "POST",
-         data: {
-          'name':'ac',
-          'agenda':'to tea,sdnmst',
-          's_hour':15,
-          's_min':4,
-          'e_hour':17,
-          'e_min':5,
-          'group_uuid':get_uuid(),
-          'duration':3,
-          'day':11,
-          'month':1,
-          'year':2018,
-          'venue':'clasasds 107',
-         },
-         success: function(response) {
-           if(response['status']==200){
-             M.toast({html: 'Meeting Created successfully'});
-            //  window.location.pathname = "/home";
-           }
-           else
-             M.toast({html: 'Some error occurred'});
+  function get_time_h(x) {
+   var h = parseInt(parseInt(x[0])*10+ parseInt(x[1]));
+    if(x[6]=="P")
+      h+=parseInt(12);
+    return h;
+  }
 
-         },
-       });
+  function get_time_m(x) {
+   var  m = parseInt(x[3]*10+ parseInt(x[4]));
+    return m;
+  }
+
+  function get_duration(x1,y1,x2,y2){
+    return parseInt(x2*60+y2-(x1*60+y1));
+  }
+
+  function get_day(x){
+    var d = parseInt(x[4]*10+parseInt(x[5]));
+    return d;
+  }
+
+  function get_year(x){
+    var d = parseInt(parseInt(x[8])*1000+parseInt(x[9])*100+parseInt(x[10])*10+parseInt(x[11]));
+    return d;
+  }
+
+  function get_month(x){
+    y = "";
+    for (var i=0;i<x.length;i++){
+      if(x[i] == " ")
+        break;
+      y += x[i];
+    }
+    return month_dict[y].toString();
+  }
+
+
+$( "#meeting_date_id" ).keydown(false);
+$( "#meeting_to_time_id" ).keydown(false);
+$( "#meeting_from_time_id" ).keydown(false);
+
+  $("#submit_meeting_id").click(function (){
+
+    if($("#meeting_name_id").val() == "" ||  $("#meeting_agenda_id").val() == "" || $("#meeting_date_id").val() == "" || $("#meeting_from_time_id").val() == "" || $("#meeting_to_time_id").val() == "" || $("#meeting_venue_id").val() == ""){
+       M.toast({html: 'All inputs are compulsory!'});
+       return;
+     }
+
+     s_hour = get_time_h($("#meeting_from_time_id").val());
+     s_min = get_time_m($("#meeting_from_time_id").val());
+
+     e_hour = get_time_h($("#meeting_to_time_id").val());
+     e_min = get_time_m($("#meeting_to_time_id").val());
+
+     duration = get_duration(s_hour,s_min,e_hour,e_min);
+
+     if(duration <= 0){
+       M.toast({html: 'Time duration must be positive!'});
+       console.log(duration);
+      return;
+     }
+
+     var instance = M.Datepicker.getInstance(meeting_date_id);
+
+     day = get_day(instance.toString());
+     month = get_month(instance.toString());
+     year = get_year(instance.toString());
+
+    // $.ajax({
+    //          url: "/Create_Meeting_Submit/",
+    //          type: "POST",
+    //          data: {
+    //           'name':'ac',
+    //           'agenda':'to tea,sdnmst',
+    //           's_hour':15,
+    //           's_min':4,
+    //           'e_hour':17,
+    //           'e_min':5,
+    //           'group_uuid':get_uuid(),
+    //           'duration':3,
+    //           'day':11,
+    //           'month':1,
+    //           'year':2018,
+    //           'venue':'clasasds 107',
+    //          },
+    //          success: function(response) {
+    //            if(response['status']==200){
+    //              M.toast({html: 'Meeting Created successfully'});
+    //             //  window.location.pathname = "/home";
+    //            }
+    //            else
+    //              M.toast({html: 'Some error occurred'});
+    //
+    //          },
+    //        });
+  });
+
 
 </script>
 {% endblock %}
