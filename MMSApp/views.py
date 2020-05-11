@@ -14,8 +14,9 @@ from django.http import HttpResponse, HttpResponseRedirect
 
 import json
 import uuid
-from datetime import datetime
+from datetime import datetime,time,date
 
+from django.utils.timezone import localtime
 from django.core.files import File
 from io import BytesIO
 from PIL import Image as IMage
@@ -339,9 +340,9 @@ class Get_Group_DetailsAPI(APIView):
                 if user in admin_set:
                     response['isAdmin'] = "1"
 
-                past_meets = group.meetings.filter(end_time__lte = datetime.now())
-                ongoing = group.meetings.filter(start_time__lte = datetime.now(), end_time__gte = datetime.now())
-                upcoming = group.meetings.filter(start_time__gte = datetime.now())
+                past_meets = group.meeting_set.all().filter(end_time__lte = localtime())
+                ongoing = group.meeting_set.all().filter(start_time__lte = localtime(), end_time__gte = localtime())
+                upcoming = group.meeting_set.all().filter(start_time__gte = localtime())
 
                 for meet in past_meets:
                     temp = {}
@@ -496,3 +497,47 @@ class Edit_Group_SubmitAPI(APIView):
         return Response(data=response)
 
 Edit_Group_Submit = Edit_Group_SubmitAPI.as_view()
+
+
+
+class Create_Meeting_SubmitAPI(APIView):
+
+    authentication_classes = (CsrfExemptSessionAuthentication,BasicAuthentication)
+
+    def post(self, request, *args, **kwargs):
+        response = {}
+        response["status"] = 500
+
+        try:
+            data = request.data
+            user = request.user
+
+            user = CustomUser.objects.get(username = user.username)
+            group = Group.objects.get(uuid = str(data['group_uuid']))
+            chatroom    = ChatRoom(name=data['name'])
+            chatroom.save()
+            
+            m1 = Meeting()
+
+            m1.name        = data['name']
+            m1.agenda      = data['agenda']
+            m1.group       = group
+            m1.start_time  = datetime(int(data['year']),int(data['month']),int(data['day']),int(data['s_hour']),int(data['s_min']))
+            m1.end_time    = datetime(int(data['year']),int(data['month']),int(data['day']),int(data['e_hour']),int(data['e_min']))
+            m1.meeting_date= date(int(data['year']),int(data['month']),int(data['day']))
+            m1.duration    = int(data['duration'])
+            m1.venue       = data['venue']
+            m1.chatroom    = chatroom
+            # resources   
+
+            m1.save()
+            # print(m1.start_time,m1.end_time)
+            
+            response['status']=200
+        except Exception as e:
+            error()
+            print("ERROR IN  = Create_Group_SubmitAPI", str(e))
+
+        return Response(data=response)
+
+Create_Meeting_Submit = Create_Meeting_SubmitAPI.as_view()

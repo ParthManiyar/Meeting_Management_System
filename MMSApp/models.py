@@ -21,7 +21,7 @@ class Event(models.Model):
     start_time = models.TimeField()
     end_time   = models.TimeField()
     name       = models.CharField(max_length=200)
-    Venue      = models.ForeignKey(Venue, on_delete=models.CASCADE)
+    venue      = models.CharField(max_length=200, default="N/A")
     uuid = models.CharField(max_length=100,default = get_uuid(), editable=False)
 
     def __str__(self):
@@ -74,7 +74,7 @@ class Message(models.Model):
     text   = models.CharField(max_length=1000)
     writer = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     time   = models.DateTimeField(auto_now=True)
-    uuid = models.CharField(max_length=100,default = get_uuid(), editable=False)
+    uuid   = models.CharField(max_length=100,default = get_uuid(), editable=False)
 
     def __str__(self):
         return self.text
@@ -85,7 +85,7 @@ class ChatRoom(models.Model):
 
     name     = models.CharField(max_length=200,default="Chat room")
     messages = models.ManyToManyField(Message)
-    uuid = models.CharField(max_length=100,default = get_uuid(), editable=False)
+    uuid     = models.CharField(max_length=100,default = get_uuid(), editable=False)
 
     def __str__(self):
         return self.name
@@ -104,35 +104,11 @@ class Resource(models.Model):
 
 #########
 
-class Meeting(models.Model):
-
-    name         = models.CharField(max_length=200)
-    agenda       = models.CharField(max_length=500)
-    admins       = models.ManyToManyField(CustomUser,related_name="meeting_admin")
-    invitees     = models.ManyToManyField(CustomUser,related_name="invitee")
-    attendees    = models.ManyToManyField(CustomUser,related_name="attendee")
-    start_time   = models.DateTimeField()
-    end_time     = models.DateTimeField()
-    duration     = models.IntegerField() ##
-    venue        = models.ForeignKey(Venue, on_delete=models.CASCADE)
-    resources    = models.ManyToManyField(Resource)
-    chatroom     = models.ForeignKey(ChatRoom, on_delete=models.CASCADE)
-    created_date = models.DateTimeField()
-    uuid = models.CharField(max_length=100,default = get_uuid(), editable=False)
-
-    def __str__(self):
-        return self.name
-
-    def get_time(self):
-        return self.start_time.strftime('%B %d %Y')
-#########
-
 class Group(models.Model):
 
     name         = models.CharField(max_length=200)
     admins       = models.ManyToManyField(CustomUser,related_name="admin")
     members      = models.ManyToManyField(CustomUser,related_name="member")
-    meetings     = models.ManyToManyField(Meeting,related_name="group")
     created_date = models.DateTimeField(auto_now=True)
     uuid = models.CharField(max_length=100,default = get_uuid(), editable=False)
 
@@ -143,6 +119,30 @@ class Group(models.Model):
         return self.created_date.strftime('%B %d %Y')
 
 #########
+
+class Meeting(models.Model):
+
+    name         = models.CharField(max_length=200)
+    agenda       = models.CharField(max_length=500)
+    group        = models.ForeignKey(Group,on_delete=models.CASCADE)
+    attendees    = models.ManyToManyField(CustomUser,related_name="attendee")
+    meeting_date = models.DateField(blank=True)
+    start_time   = models.DateTimeField(blank=True)
+    end_time     = models.DateTimeField(blank=True)
+    duration     = models.IntegerField(default=1) ##
+    venue        = models.CharField(max_length=200, default="N/A")
+    resources    = models.ManyToManyField(Resource)
+    chatroom     = models.ForeignKey(ChatRoom, on_delete=models.CASCADE)
+    created_date = models.DateTimeField(auto_now=True)
+    uuid = models.CharField(max_length=100,default = get_uuid(), editable=False)
+
+    def __str__(self):
+        return self.name
+
+    def get_time(self):
+        return self.start_time.strftime('%B %d %Y')
+#########
+
 
 class Notification(models.Model):
 
