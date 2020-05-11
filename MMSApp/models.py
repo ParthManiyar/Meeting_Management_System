@@ -16,7 +16,7 @@ class Venue(models.Model):
 
     def save(self, *args, **kwargs):
         if self.pk==None:
-            self.uuid == get_uuid()
+            self.uuid = get_uuid()
         super(Venue, self).save(*args, **kwargs)
 
 #########
@@ -34,7 +34,7 @@ class Event(models.Model):
 
     def save(self, *args, **kwargs):
         if self.pk==None:
-            self.uuid == get_uuid()
+            self.uuid = get_uuid()
         super(Event, self).save(*args, **kwargs)
 
 #########
@@ -50,7 +50,7 @@ class DailySchedule(models.Model):
 
     def save(self, *args, **kwargs):
         if self.pk==None:
-            self.uuid == get_uuid()
+            self.uuid = get_uuid()
         super(DailySchedule, self).save(*args, **kwargs)
 #########
 
@@ -80,7 +80,7 @@ class CustomUser(User):
     def save(self, *args, **kwargs):
         if self.pk==None:
             self.set_password(self.password)
-            self.uuid == get_uuid()
+            self.uuid = get_uuid()
         super(CustomUser, self).save(*args, **kwargs)
 
 #########
@@ -97,7 +97,7 @@ class Message(models.Model):
 
     def save(self, *args, **kwargs):
         if self.pk==None:
-            self.uuid == get_uuid()
+            self.uuid = get_uuid()
         super(Message, self).save(*args, **kwargs)
 
 #########
@@ -113,7 +113,7 @@ class ChatRoom(models.Model):
 
     def save(self, *args, **kwargs):
         if self.pk==None:
-            self.uuid == get_uuid()
+            self.uuid = get_uuid()
         super(ChatRoom, self).save(*args, **kwargs)
 
 #########
@@ -130,7 +130,7 @@ class Resource(models.Model):
 
     def save(self, *args, **kwargs):
         if self.pk==None:
-            self.uuid == get_uuid()
+            self.uuid = get_uuid()
         super(Resource, self).save(*args, **kwargs)
 
 #########
@@ -151,7 +151,7 @@ class Group(models.Model):
 
     def save(self, *args, **kwargs):
         if self.pk==None:
-            self.uuid == get_uuid()
+            self.uuid = get_uuid()
         super(Group, self).save(*args, **kwargs)
 
 #########
@@ -163,8 +163,8 @@ class Meeting(models.Model):
     group        = models.ForeignKey(Group,on_delete=models.CASCADE)
     attendees    = models.ManyToManyField(CustomUser,related_name="attendee")
     meeting_date = models.DateField(blank=True,null=True)
-    start_time   = models.DateTimeField(blank=True)
-    end_time     = models.DateTimeField(blank=True)
+    start_time   = models.DateTimeField(blank=True,null=True)
+    end_time     = models.DateTimeField(blank=True,null=True)
     duration     = models.IntegerField(default=1) ##
     venue        = models.CharField(max_length=200, default="N/A")
     resources    = models.ManyToManyField(Resource)
@@ -180,7 +180,7 @@ class Meeting(models.Model):
 
     def save(self, *args, **kwargs):
         if self.pk==None:
-            self.uuid == get_uuid()
+            self.uuid = get_uuid()
         super(Meeting, self).save(*args, **kwargs)
 #########
 
@@ -198,5 +198,5 @@ class Notification(models.Model):
 
     def save(self, *args, **kwargs):
         if self.pk==None:
-            self.uuid == get_uuid()
+            self.uuid = get_uuid()
         super(Notification, self).save(*args, **kwargs)
