@@ -29,4 +29,6 @@ urlpatterns = [
     path('meetings/<str:meeting_uuid>/', views.Single_Meeting),
     path('Get_Meeting_Details/',views.Get_Meeting_Details),
     path('Edit_Meeting_Submit/',views.Edit_Meeting_Submit),
+    # Schedule
+    path('schedule/',views.Schedule),
 ]

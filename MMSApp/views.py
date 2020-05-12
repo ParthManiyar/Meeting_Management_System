@@ -45,6 +45,7 @@ class CsrfExemptSessionAuthentication(SessionAuthentication):
 
 # FUNCTIONS BELOW
 
+# Authentication
 @login_required(login_url='/login/')
 def Home(request):
     return render(request,'MMSApp/home.html')
@@ -60,6 +61,8 @@ def Logout(request):
     logout(request)
     return HttpResponseRedirect('/login/')
 
+# Group
+
 @login_required(login_url='/login/')
 def Create_Group(request):
     return render(request,'MMSApp/group_cu.html')
@@ -72,6 +75,8 @@ def Edit_Group(request, group_uuid):
 def Single_Group(request, group_uuid):
     return render(request,'MMSApp/group_rd.html')
 
+# Meeting
+
 @login_required(login_url='/login/')
 def Create_Meeting(request,group_uuid):
     return render(request,'MMSApp/meeting_cu.html')
@@ -83,6 +88,12 @@ def Edit_Meeting(request,meeting_uuid):
 @login_required(login_url='/login/')
 def Single_Meeting(request,meeting_uuid):
     return render(request,'MMSApp/meeting_rd.html')
+
+# Schedule
+
+@login_required(login_url='/login/')
+def Schedule(request):
+    return render(request,'MMSApp/schedule_crud.html')
 
 # LOGGER
 

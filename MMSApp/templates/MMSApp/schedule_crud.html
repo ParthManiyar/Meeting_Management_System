@@ -1,0 +1,64 @@
+{% extends 'MMSApp/base.html' %}
+{% block content %}
+{% load static %}
+
+<br><br>
+
+<div class="container" style="width:90%;">
+  <div class="row -wrapper">
+    <div class="col" >
+      <a class="btn-floating btn waves-effect waves-light "><i class="material-icons">arrow_back</i></a>
+      <a class="btn-floating btn waves-effect waves-light "><i class="material-icons">arrow_forward</i></a>
+      <br><br>
+    </div>
+    <div class="col s2">
+      <h4 id="schedule_month" style="margin:0;display:inline-block">May,</h4>
+      <h4 id="schedule_year" style="margin:0;display:inline-block">2020</h4>
+    </div>
+  </div>
+  <div class="schedule-wrapper" id="schedule-wrapper-id">
+  </div>
+  <br>
+  </div>
+
+</div>
+
+<script type="text/javascript">
+
+  inv_day_dict = {
+
+    1 : "SUNDAY",
+    2 : "MONDAY",
+    3 : "TUESDAY",
+    4 : "WEDNESDAY",
+    5 : "THURSDAY",
+    6 : "FRIDAY",
+    7 : "SATURDAY",
+
+  };
+
+  var d = new Date();
+  var month = d.getMonth();
+  var year = d.getFullYear();
+
+  var i=1;
+    for (var j=1;j<=7;j++){
+      var temp =  '<div class="row'+i+' col'+j+' week-box ">'+inv_day_dict[j]+'</div>';
+      $("#schedule-wrapper-id").append(temp);
+    }
+
+
+  for (var i=2;i<=6;i++){
+    for (var j=1;j<=7;j++){
+      var temp =  '<div class="row'+i+' col'+j+' day-box fancyScrollschedule">\
+        <div class="event-component">CSC306</div>\
+        <div class="day-box-date">'+i+'</div>\
+        <i class=" material-icons edit-button">edit</i>\
+    </div>';
+      $("#schedule-wrapper-id").append(temp);
+    }
+  }
+
+</script>
+
+{% endblock %}
