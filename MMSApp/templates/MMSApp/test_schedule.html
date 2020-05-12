@@ -1,0 +1,30 @@
+{% extends 'MMSApp/base.html' %}
+{% block content %}
+{% load static %}
+<div id = "result">
+
+</div>
+<script>
+
+
+$.ajax({
+         url: "/Get_Monthly_Schedule/",
+         type: "POST",
+         data: {
+          'month':1,
+          'year':2018,
+         },
+         success: function(response) {
+           console.log(response);
+           $("#result").html(response);
+           if(response['status']==200){
+                         
+           }
+           else
+             M.toast({html: 'Some error occurred'});
+
+         },
+       });
+
+</script>
+{% endblock %}

@@ -31,6 +31,12 @@ class Event(models.Model):
 
     def __str__(self):
         return self.name
+    
+    def get_start_time(self):
+        return self.start_time.strftime('%I:%M %p')
+
+    def get_end_time(self):
+        return self.end_time.strftime('%I:%M %p')
 
     def save(self, *args, **kwargs):
         if self.pk==None:
@@ -46,7 +52,8 @@ class DailySchedule(models.Model):
     uuid = models.CharField(max_length=100,default = "", editable=False)
 
     def __str__(self):
-        return self.date
+        return str(self.date)
+    
 
     def save(self, *args, **kwargs):
         if self.pk==None:
@@ -54,14 +61,18 @@ class DailySchedule(models.Model):
         super(DailySchedule, self).save(*args, **kwargs)
 #########
 
-# class Schedule(models.Model):
+class Schedule(models.Model):
 
-#     daily_schedules = models.ManyToManyField(DailySchedule)
-#     uuid = models.CharField(max_length=100)
+    daily_schedules = models.ManyToManyField(DailySchedule)
+    uuid = models.CharField(max_length=100)
 
-#     def __str__(self):
-#         return self.schedule_users.all()
+    def __str__(self):
+        return self.uuid
 
+    def save(self, *args, **kwargs):
+        if self.pk==None:
+            self.uuid = get_uuid()
+        super(Schedule, self).save(*args, **kwargs)
 #########
 
 class CustomUser(User):
@@ -70,7 +81,7 @@ class CustomUser(User):
         verbose_name = "CustomUser"
         verbose_name_plural = "CustomUsers"
 
-    schedule = models.ManyToManyField(DailySchedule,related_name="schedule_users")
+    schedule = models.ForeignKey(Schedule,related_name="schedule_users",on_delete=models.CASCADE,null=True)
     uuid = models.CharField(max_length=100,default = "", editable=False)
     dp = models.ImageField(upload_to='',blank=True)
 
