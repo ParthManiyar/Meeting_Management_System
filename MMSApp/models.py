@@ -147,7 +147,7 @@ class Group(models.Model):
         return self.name
 
     def get_created_date(self):
-        return self.created_date.strftime('%B %d %Y')
+        return self.created_date.strftime('%B %d, %Y')
 
     def save(self, *args, **kwargs):
         if self.pk==None:
@@ -175,8 +175,14 @@ class Meeting(models.Model):
     def __str__(self):
         return self.name
 
-    def get_time(self):
-        return self.start_time.strftime('%B %d %Y')
+    def get_meeting_date(self):
+        return self.start_time.strftime('%B %d, %Y')
+    
+    def get_start_time(self):
+        return self.start_time.strftime('%I:%M %p')
+
+    def get_end_time(self):
+        return self.end_time.strftime('%I:%M %p')
 
     def save(self, *args, **kwargs):
         if self.pk==None:

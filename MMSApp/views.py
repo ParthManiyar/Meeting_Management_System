@@ -350,7 +350,9 @@ class Get_Group_DetailsAPI(APIView):
                     temp['uuid'] = meet.uuid
                     temp['name'] = meet.name
                     temp['agenda'] = meet.agenda
-                    temp['time'] = meet.get_time()
+                    temp['meeting_date'] = meet.get_meeting_date()
+                    temp['start_time'] = meet.get_start_time()
+                    temp['end_time'] = meet.get_end_time()
                     response['past_meets'].append(temp)
 
                 for meet in ongoing:
@@ -358,7 +360,9 @@ class Get_Group_DetailsAPI(APIView):
                     temp['uuid'] = meet.uuid
                     temp['name'] = meet.name
                     temp['agenda'] = meet.agenda
-                    temp['time'] = meet.get_time()
+                    temp['meeting_date'] = meet.get_meeting_date()
+                    temp['start_time'] = meet.get_start_time()
+                    temp['end_time'] = meet.get_end_time()
                     response['ongoing_meets'].append(temp)
 
                 for meet in upcoming:
@@ -366,7 +370,9 @@ class Get_Group_DetailsAPI(APIView):
                     temp['uuid'] = meet.uuid
                     temp['name'] = meet.name
                     temp['agenda'] = meet.agenda
-                    temp['time'] = meet.get_time()
+                    temp['meeting_date'] = meet.get_meeting_date()
+                    temp['start_time'] = meet.get_start_time()
+                    temp['end_time'] = meet.get_end_time()
                     response['upcoming_meets'].append(temp)
 
                 response['status']=200
@@ -631,3 +637,6 @@ class Edit_Meeting_SubmitAPI(APIView):
         return Response(data=response)
 
 Edit_Meeting_Submit = Edit_Meeting_SubmitAPI.as_view()
+
+
+# class 
