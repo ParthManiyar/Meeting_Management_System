@@ -112,19 +112,27 @@ function Get_Monthly_Schedule(){
              success: function(response) {
                console.log(response);
                if(response['status']==200){
+
                  var r = 2;
                  var c = (response['first_day']+1)%7+1;
-                 var days = 0;
-                 while(days < response['days']){
-                   days += 1;
-                   // for(var )
-                   var temp =  '<div class="row'+r+' col'+c+' day-box fancyScrollschedule">\
-                        <div class="event-component">CSC306</div>\
-                        <div class="day-box-date">'+days+'</div>\
+                 var days = 1;
+
+                 while(days <= response['days']){
+                   var temp = "";
+
+                   temp +=  '<div class="row'+r+' col'+c+' day-box fancyScrollschedule">';
+
+                     for(var i=0;i<response['schedule'][days]['events'].length;i++){
+                        temp += '<div class="event-component">'+response['schedule'][days]['events'][i]+'</div>';
+                     }
+
+                        temp += '<div class="day-box-date">'+days+'</div>\
                         <a href="#edit_day_schedule" day="'+days+'" class="modal-trigger edit_day_schedule_class">\
                           <i class=" material-icons edit-button" style="color:black">edit</i>\
                         </a>\
                     </div>';
+
+                  days += 1;
                   c++;
                   if(c>7){
                     c = 1;

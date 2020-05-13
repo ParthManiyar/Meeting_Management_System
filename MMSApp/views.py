@@ -93,7 +93,7 @@ def Single_Meeting(request,meeting_uuid):
 # Schedule
 
 @login_required(login_url='/login/')
-def Schedule(request):
+def Get_Schedule(request):
     return render(request,'MMSApp/schedule_crud.html')
 
 # LOGGER
@@ -669,7 +669,7 @@ class Get_Monthly_ScheduleAPI(APIView):
             day1,days = monthrange(year,month)
 
             response['schedule'] = []
-            for i in range(days):
+            for i in range(days+1):
                 response['schedule'].append("No Events")
 
             # uncomment for testing
@@ -686,13 +686,18 @@ class Get_Monthly_ScheduleAPI(APIView):
 
             e2 = Event(name="Event2",venue="v2",start_time=datetime.now()+timedelta(hours=1),end_time=datetime.now()+timedelta(hours=2))
             e2.save()
+
             e3 = Event(name="Event3",venue="v3",start_time=datetime.now(),end_time=datetime.now()+timedelta(hours=2))
             e3.save()
 
+            e4 = Event(name="Event3",venue="v3",start_time=datetime.now(),end_time=datetime.now()+timedelta(hours=2))
+            e4.save()
+
             d.events.add(e1)
             d.events.add(e2)
+            d.events.add(e3)
             d.save()
-            d2.events.add(e3)
+            d2.events.add(e4)
             d2.save()
             s.daily_schedules.add(d)
             s.daily_schedules.add(d2)
@@ -716,7 +721,7 @@ class Get_Monthly_ScheduleAPI(APIView):
                     events = list(daily.events.all().order_by('start_time'))
 
                     if(len(events)>0):
-                        i = daily.date.day-1
+                        i = daily.date.day
 
                         response['schedule'][i] = {}
                         response['schedule'][i]['date_uuid'] = daily.uuid

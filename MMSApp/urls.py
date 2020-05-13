@@ -30,6 +30,6 @@ urlpatterns = [
     path('Get_Meeting_Details/',views.Get_Meeting_Details),
     path('Edit_Meeting_Submit/',views.Edit_Meeting_Submit),
     # Schedule
-    path('schedule/',views.Schedule),
-    path('Get_Monthly_Schedule/',views.Get_Monthly_Schedule),    
+    path('schedule/',views.Get_Schedule),
+    path('Get_Monthly_Schedule/',views.Get_Monthly_Schedule),
 ]
