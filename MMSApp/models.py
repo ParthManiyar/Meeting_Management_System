@@ -26,6 +26,7 @@ class Event(models.Model):
     start_time = models.TimeField()
     end_time   = models.TimeField()
     name       = models.CharField(max_length=200)
+    description= models.CharField(max_length=200,null=True)
     venue      = models.CharField(max_length=200, default="N/A")
     uuid = models.CharField(max_length=100,default = "", editable=False)
 
