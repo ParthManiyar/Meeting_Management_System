@@ -14,7 +14,8 @@ from django.http import HttpResponse, HttpResponseRedirect
 
 import json
 import uuid
-from datetime import datetime,time,date
+from datetime import datetime,time,date,timedelta
+from calendar import monthrange
 
 from django.utils.timezone import localtime
 from django.core.files import File
@@ -361,7 +362,9 @@ class Get_Group_DetailsAPI(APIView):
                     temp['uuid'] = meet.uuid
                     temp['name'] = meet.name
                     temp['agenda'] = meet.agenda
-                    temp['time'] = meet.get_time()
+                    temp['meeting_date'] = meet.get_meeting_date()
+                    temp['start_time'] = meet.get_start_time()
+                    temp['end_time'] = meet.get_end_time()
                     response['past_meets'].append(temp)
 
                 for meet in ongoing:
@@ -369,7 +372,9 @@ class Get_Group_DetailsAPI(APIView):
                     temp['uuid'] = meet.uuid
                     temp['name'] = meet.name
                     temp['agenda'] = meet.agenda
-                    temp['time'] = meet.get_time()
+                    temp['meeting_date'] = meet.get_meeting_date()
+                    temp['start_time'] = meet.get_start_time()
+                    temp['end_time'] = meet.get_end_time()
                     response['ongoing_meets'].append(temp)
 
                 for meet in upcoming:
@@ -377,7 +382,9 @@ class Get_Group_DetailsAPI(APIView):
                     temp['uuid'] = meet.uuid
                     temp['name'] = meet.name
                     temp['agenda'] = meet.agenda
-                    temp['time'] = meet.get_time()
+                    temp['meeting_date'] = meet.get_meeting_date()
+                    temp['start_time'] = meet.get_start_time()
+                    temp['end_time'] = meet.get_end_time()
                     response['upcoming_meets'].append(temp)
 
                 response['status']=200
@@ -513,7 +520,6 @@ class Edit_Group_SubmitAPI(APIView):
 Edit_Group_Submit = Edit_Group_SubmitAPI.as_view()
 
 
-
 class Create_Meeting_SubmitAPI(APIView):
 
     authentication_classes = (CsrfExemptSessionAuthentication,BasicAuthentication)
@@ -556,7 +562,6 @@ class Create_Meeting_SubmitAPI(APIView):
         return Response(data=response)
 
 Create_Meeting_Submit = Create_Meeting_SubmitAPI.as_view()
-
 
 
 class Get_Meeting_DetailsAPI(APIView):
@@ -642,3 +647,98 @@ class Edit_Meeting_SubmitAPI(APIView):
         return Response(data=response)
 
 Edit_Meeting_Submit = Edit_Meeting_SubmitAPI.as_view()
+
+
+class Get_Monthly_ScheduleAPI(APIView):
+
+    authentication_classes = (CsrfExemptSessionAuthentication,BasicAuthentication)
+
+    def post(self, request, *args, **kwargs):
+        response = {}
+        response["status"] = 500
+
+        try:
+            data = request.data
+            user = request.user
+
+            month = int(data['month'])
+            year = int(data['year'])
+
+            user = CustomUser.objects.get(username = user.username)
+
+            day1,days = monthrange(year,month)
+
+            response['schedule'] = []
+            for i in range(days):
+                response['schedule'].append("No Events")
+
+            # uncomment for testing
+            s = Schedule()
+            s.save()
+            d = DailySchedule(date=datetime(year,month,2))
+            d.save()
+
+            d2 = DailySchedule(date=datetime(year,month,4))
+            d2.save()
+
+            e1 = Event(name="Event1",venue="v1",start_time=datetime.now(),end_time=datetime.now()+timedelta(hours=2))
+            e1.save()
+
+            e2 = Event(name="Event2",venue="v2",start_time=datetime.now()+timedelta(hours=1),end_time=datetime.now()+timedelta(hours=2))
+            e2.save()
+            e3 = Event(name="Event3",venue="v3",start_time=datetime.now(),end_time=datetime.now()+timedelta(hours=2))
+            e3.save()
+
+            d.events.add(e1)
+            d.events.add(e2)
+            d.save()
+            d2.events.add(e3)
+            d2.save()
+            s.daily_schedules.add(d)
+            s.daily_schedules.add(d2)
+            s.save()
+
+            user.schedule = s
+            user.save()
+
+            print(user.schedule.daily_schedules.all())
+
+            if(user.schedule!=None):
+
+                d1 = datetime(year,month,1)
+                d2 = datetime(year,month,days)
+
+                schedule = user.schedule
+                query_list = list(schedule.daily_schedules.all().filter(date__gte=d1,date__lte=d2))
+
+                for daily in query_list:
+
+                    events = list(daily.events.all().order_by('start_time'))
+
+                    if(len(events)>0):
+                        i = daily.date.day-1
+
+                        response['schedule'][i] = {}
+                        response['schedule'][i]['date_uuid'] = daily.uuid
+                        response['schedule'][i]['events']=[]
+
+                        for event in events:
+                            temp = {}
+                            temp['uuid'] = event.uuid
+                            temp['name'] = event.name
+                            temp['start_time'] = event.get_start_time()
+                            temp['end_time'] = event.get_end_time()
+                            temp['venue'] = event.venue
+                            response['schedule'][i]['events'].append(temp)
+
+            response['status']=200
+            response['first_day'] = day1
+            response['days'] = days
+
+        except Exception as e:
+            error()
+            print("ERROR IN  = Get_Monthly_ScheduleAPI", str(e))
+
+        return Response(data=response)
+
+Get_Monthly_Schedule = Get_Monthly_ScheduleAPI.as_view()

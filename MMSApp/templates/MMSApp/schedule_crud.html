@@ -4,20 +4,49 @@
 
 <br><br>
 
-<div class="container" style="width:90%;">
+<div class="container" style="width:75%;">
   <div class="row -wrapper">
     <div class="col" >
-      <a class="btn-floating btn waves-effect waves-light "><i class="material-icons">arrow_back</i></a>
-      <a class="btn-floating btn waves-effect waves-light "><i class="material-icons">arrow_forward</i></a>
+      <a class="btn-floating btn waves-effect waves-light " id="arrow_back_id"><i class="material-icons">arrow_back</i></a>
+      <a class="btn-floating btn waves-effect waves-light " id="arrow_forward_id"><i class="material-icons">arrow_forward</i></a
       <br><br>
     </div>
-    <div class="col s2">
+    <div class="col s3">
       <h4 id="schedule_month" style="margin:0;display:inline-block">May,</h4>
       <h4 id="schedule_year" style="margin:0;display:inline-block">2020</h4>
     </div>
   </div>
   <div class="schedule-wrapper" id="schedule-wrapper-id">
   </div>
+
+
+  <div id="edit_day_schedule" class="modal modal-fixed-footer" style="width:60%;background-color:#003d72;">
+    <div class="modal-content center modal-fixed-footer fancyScrollreverse" id="edit_schedule_modal_content_id" style="y-overflow:auto;">
+      <h4 id="modal_content_date_edit_id" style="color:white">Date</h4><br>
+      <div class="container" style="width:90%">
+        <ul class="collapsible" id="collapsible_id">
+          <li>
+            <div class="collapsible-header" id="collapse_1" state="off">
+              <i class="material-icons">add</i>
+              Add New Event
+              </div>
+            <div class="collapsible-body" id="collapse_body_1"></div>
+          </li>
+          <li>
+            <div class="collapsible-header" id="collapse_2" state="off">
+              <i class="material-icons">place</i>
+              Second
+              </div>
+            <div class="collapsible-body" id="collapse_body_2"></div>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <a href="#!" class="modal-close waves-effect waves-green btn-flat">Close</a>
+    </div>
+  </div>
+
   <br>
   </div>
 
@@ -37,27 +66,213 @@
 
   };
 
+  month_dict = {
+    1:'Jan',
+    2:'Feb',
+    3:'Mar',
+    4:'Apr',
+    5:'May',
+    6:'Jun',
+    7:'Jul',
+    8:'Aug',
+    9:'Sep',
+    10:'Oct',
+    11:'Nov',
+    12:'Dec',
+  };
+
   var d = new Date();
-  var month = d.getMonth();
+  var month = d.getMonth()+1;
   var year = d.getFullYear();
 
+function append_day_names(){
   var i=1;
     for (var j=1;j<=7;j++){
       var temp =  '<div class="row'+i+' col'+j+' week-box ">'+inv_day_dict[j]+'</div>';
       $("#schedule-wrapper-id").append(temp);
     }
+}
+
+function clear_schedule(){
+  $("#schedule-wrapper-id").empty();
+  append_day_names();
+}
+
+var response_schedule = {};
+
+function Get_Monthly_Schedule(){
+    $.ajax({
+             url: "/Get_Monthly_Schedule/",
+             type: "POST",
+             async: false,
+             data: {
+              'month':month,
+              'year':year,
+             },
+             success: function(response) {
+               console.log(response);
+               if(response['status']==200){
+                 var r = 2;
+                 var c = (response['first_day']+1)%7+1;
+                 var days = 0;
+                 while(days < response['days']){
+                   days += 1;
+                   // for(var )
+                   var temp =  '<div class="row'+r+' col'+c+' day-box fancyScrollschedule">\
+                        <div class="event-component">CSC306</div>\
+                        <div class="day-box-date">'+days+'</div>\
+                        <a href="#edit_day_schedule" day="'+days+'" class="modal-trigger edit_day_schedule_class">\
+                          <i class=" material-icons edit-button" style="color:black">edit</i>\
+                        </a>\
+                    </div>';
+                  c++;
+                  if(c>7){
+                    c = 1;
+                    r++;
+                  }
+                      $("#schedule-wrapper-id").append(temp);
+                 }
+                 response_schedule = response['schedule']
+               }
+               else
+                 M.toast({html: 'Some error occurred'});
+             },
+           });
+        }
+
+        function update_month_year(){
+          $("#schedule_month").text(month_dict[month]+",");
+          $("#schedule_year").text(year);
+          clear_schedule();
+          Get_Monthly_Schedule();
+        }
+
+        append_day_names();
+        Get_Monthly_Schedule();
+
+        $("#arrow_back_id").click(function(){
+            month-=1;
+            if(month<1){
+              month = 12;
+              year -= 1;
+            }
+            update_month_year();
+        });
+
+        $("#arrow_forward_id").click(function(){
+            month+=1;
+            if(month>12){
+              month = 1;
+              year += 1;
+            }
+            update_month_year();
+        });
 
 
-  for (var i=2;i<=6;i++){
-    for (var j=1;j<=7;j++){
-      var temp =  '<div class="row'+i+' col'+j+' day-box fancyScrollschedule">\
-        <div class="event-component">CSC306</div>\
-        <div class="day-box-date">'+i+'</div>\
-        <i class=" material-icons edit-button">edit</i>\
-    </div>';
-      $("#schedule-wrapper-id").append(temp);
-    }
-  }
+        $(document).on("click", ".edit_day_schedule_class", function(){
+          var day = $(this).attr("day");
+          var date = month_dict[month]+" "+day+", "+year.toString();
+          $("#modal_content_date_edit_id").text(date);
+          var cnt = 0;
+          $(".collapsible-header").each(function(){
+            $(this).empty();
+            var temp_html = '<div class="row zero-margin-absolute" style="width:100%;">\
+              <div class="col s5 valign-wrapper zero-margin-absolute">\
+                <i class="material-icons">access_time</i>\
+                <span>12:43 PM</span>\
+                  <span> - </span>\
+                <span>12:43 PM</span>\
+              </div>\
+              <div class="col s4 valign-wrapper zero-margin-absolute">\
+                <i class="material-icons">event</i>\
+                  <span>CSC306<span>\
+              </div>\
+              <div class="col s3 valign-wrapper zero-margin-absolute">\
+                <i class="material-icons">place</i>\
+                  <span>107<span>\
+              </div>\
+            </div>';
+            $(this).append(temp_html);
+          });
+          $(".collapsible-body").each(function() {
+            cnt += 1;
+            var temp_html = '<div class="row zero-margin">\
+                <div class="input-field col s3">\
+                  <i class="material-icons prefix white-small-icons">event</i>\
+                  <input  id="event_name_id_'+cnt+'" type="text" class="validate white-text">\
+                  <label for="event_name_id_'+cnt+'">Event Name</label>\
+                </div>\
+                <div class="input-field col s4 offset-s1">\
+                  <i class="material-icons prefix white-small-icons">event_note</i>\
+                  <input  id="event_desc_id_'+cnt+'" type="text" class="validate white-text">\
+                  <label for="event_desc_id_'+cnt+'">Event Description</label>\
+                </div>\
+                <div class="input-field col s3 offset-s1">\
+                  <i class="material-icons prefix white-small-icons">place</i>\
+                  <input  id="event_venue_id_'+cnt+'" type="text" class="validate white-text" >\
+                  <label for="event_venue_id_'+cnt+'">Venue</label>\
+                </div>\
+              </div>\
+              <div class="row zero-margin">\
+                <div class="input-field col s3">\
+                  <i class="material-icons prefix white-small-icons">access_time</i>\
+                  <input id="event_start_time_id_'+cnt+'" type="text" class="timepicker white-text" >\
+                  <label for="event_start_time_id_'+cnt+'">From</label>\
+                </div>\
+                <div class="input-field col s3 offset-s1">\
+                  <i class="material-icons prefix white-small-icons">access_time</i>\
+                  <input id="event_end_time_id_'+cnt+'" type="text" class="timepicker white-text" >\
+                  <label for="event_end_time_id_'+cnt+'">To</label>\
+                </div>\
+              </div>\
+              <div class="row zero-margin">\
+                <div class="col s5">\
+                  <p><label>\
+                      <input type="checkbox" class="event_repeat_class" id="event_repeat_id_'+cnt+'" class="filled-in" />\
+                      <span>Keep Repeating after 7 days?</span>\
+                    </label></p>\
+                </div>\
+                <div class="input-field  col s3 zero-margin" style="display:none">\
+                  <i class="material-icons prefix white-small-icons">date_range</i>\
+                  <input id="event_repeat_till_time_id_'+cnt+'" type="text" class="datepicker white-text">\
+                  <label for="event_repeat_till_time_id_'+cnt+'">Till Date</label>\
+                </div>\
+              </div>\
+              <div class="row zero-margin">\
+                <div class="col s4 offset-s8 zero-margin" >\
+                  <a class="waves-effect waves-light btn-small event_save_class" cnt="'+cnt+'">SAVE</a>\
+                  <a class="waves-effect waves-light btn-small delete-button event_delete_class"  cnt="'+cnt+'">DELETE<i class="material-icons right">delete</i></a>\
+                </div>\
+              </div>';
+            $(this).empty();
+            $(this).append(temp_html);
+          });
+          $('.datepicker').datepicker();
+          $('.timepicker').timepicker();
+        });
+
+
+    $(document).on("click", ".event_repeat_class", function(){
+      if($(this).prop("checked"))
+        $(this).parent().parent().parent().next().show();
+      else
+        $(this).parent().parent().parent().next().hide();
+    });
+
+
+    $(document).on("click", ".event_save_class", function(){
+        console.log("SAVE");
+        console.log("CNT",$(this).attr("cnt"));
+    });
+
+    $(document).on("click", ".event_delete_class", function(){
+        console.log("DELETE");
+        console.log("CNT",$(this).attr("cnt"));
+    });
+
+    function temp(){
+        console.log("OPENED");
+    };
 
 </script>
 
