@@ -6,20 +6,67 @@
 </div>
 <script>
 
+var events = []
+
+temp = {
+  name:"event1",
+  venue:"somewhere",
+  s_hour:12,
+  s_min:00,
+  e_hour:13,
+  e_min:30,
+  uuid:"1234",
+  is_deleted:false,
+  is_edited:false
+}
+
+events.push(temp)
+
+temp = {
+  name:"event2",
+  venue:"somewhere",
+  s_hour:12,
+  s_min:00,
+  e_hour:13,
+  e_min:30,
+  uuid:"67f6f5be-ff5a-4b5b-ba78-6dbf8b5183e7",
+  is_deleted:false,
+  is_edited:false
+}
+events.push(temp)
+temp = {
+  name:"event3",
+  venue:"somewhere else",
+  s_hour:'12',
+  s_min:'00',
+  e_hour:'13',
+  e_min:'30',
+  description:'asdfg working',
+  uuid:"67f6f5be-ff5a-4b5b-ba78-6dbf8b5183e7",
+  is_deleted:true,
+  is_edited:true
+}
+events.push(temp);
+
+console.log(events);
 
 $.ajax({
-         url: "/Get_Monthly_Schedule/",
+         url: "/Edit_Schedule_Submit/",
          type: "POST",
          data: {
-          'month':1,
-          'year':2018,
+          'ds_uuid':"",
+          'ds_year':"2020",
+          'ds_month':"5",
+          'ds_day':"12",
+          'event':JSON.stringify(temp),
+          'change_all':false,
          },
          success: function(response) {
            console.log(response);
            $("#result").html(response);
            if(response['status']==200){
                          
-           }
+           }  
            else
              M.toast({html: 'Some error occurred'});
 
