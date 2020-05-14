@@ -134,6 +134,7 @@ class Resource(models.Model):
 
     rfile       = models.FileField()
     owner       = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    name        = models.CharField(max_length=200,blank=True,null=True)
     upload_time = models.DateTimeField(auto_now=True)
     uuid = models.CharField(max_length=100,default = "", editable=False)
 
