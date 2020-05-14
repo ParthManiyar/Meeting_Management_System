@@ -1190,7 +1190,6 @@ class Get_Meeting_ResourcesAPI(APIView):
 
 Get_Meeting_Resources = Get_Meeting_ResourcesAPI.as_view()
 
-<<<<<<< HEAD
 class Get_NotificationsAPI(APIView):
 
     authentication_classes = (CsrfExemptSessionAuthentication,BasicAuthentication)
@@ -1457,4 +1456,3 @@ class Get_Free_Time_SlotsAPI(APIView):
         return Response(data=response)
 
 Get_Free_Time_Slots = Get_Free_Time_SlotsAPI.as_view()
->>>>>>> e8e459fbed27b44879122fd92b3f7b46b8818491
