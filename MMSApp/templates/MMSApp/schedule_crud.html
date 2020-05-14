@@ -25,20 +25,6 @@
       <h4 id="modal_content_date_edit_id" style="color:white">Date</h4><br>
       <div class="container" style="width:90%">
         <ul class="collapsible" id="collapsible_id">
-          <li>
-            <div class="collapsible-header" id="collapse_1" state="off">
-              <i class="material-icons">add</i>
-              Add New Event
-              </div>
-            <div class="collapsible-body" id="collapse_body_1"></div>
-          </li>
-          <li>
-            <div class="collapsible-header" id="collapse_2" state="off">
-              <i class="material-icons">place</i>
-              Second
-              </div>
-            <div class="collapsible-body" id="collapse_body_2"></div>
-          </li>
         </ul>
       </div>
     </div>
@@ -113,6 +99,7 @@ function Get_Monthly_Schedule(){
                console.log(response);
                if(response['status']==200){
 
+                 var max_length = 3;
                  var r = 2;
                  var c = (response['first_day']+1)%7+1;
                  var days = 1;
@@ -122,9 +109,15 @@ function Get_Monthly_Schedule(){
 
                    temp +=  '<div class="row'+r+' col'+c+' day-box fancyScrollschedule">';
 
-                     for(var i=0;i<response['schedule'][days]['events'].length;i++){
-                        temp += '<div class="event-component">'+response['schedule'][days]['events'][i]+'</div>';
-                     }
+                     if(response['schedule'][days]!=""){
+                         for(var i=0;i<Math.min(max_length,response['schedule'][days]['events'].length);i++){
+                            temp += '<div class="event-component">'+response['schedule'][days]['events'][i]['name']+'</div>';
+                         }
+                         if(response['schedule'][days]['events'].length > max_length){
+                           var dif = response['schedule'][days]['events'].length - max_length
+                           temp += '<a href="#edit_day_schedule" class="modal-trigger  edit_day_schedule_class" day="'+days+'" ><div class="plus_extra">+'+dif+' More</div></a>';
+                         }
+                       }
 
                         temp += '<div class="day-box-date">'+days+'</div>\
                         <a href="#edit_day_schedule" day="'+days+'" class="modal-trigger edit_day_schedule_class">\
@@ -140,7 +133,7 @@ function Get_Monthly_Schedule(){
                   }
                       $("#schedule-wrapper-id").append(temp);
                  }
-                 response_schedule = response['schedule']
+                 response_schedule = response;
                }
                else
                  M.toast({html: 'Some error occurred'});
@@ -176,35 +169,58 @@ function Get_Monthly_Schedule(){
             update_month_year();
         });
 
+        var day;
 
         $(document).on("click", ".edit_day_schedule_class", function(){
-          var day = $(this).attr("day");
+          day = $(this).attr("day");
           var date = month_dict[month]+" "+day+", "+year.toString();
           $("#modal_content_date_edit_id").text(date);
-          var cnt = 0;
-          $(".collapsible-header").each(function(){
-            $(this).empty();
-            var temp_html = '<div class="row zero-margin-absolute" style="width:100%;">\
+          day = parseInt(day)
+
+          $('#collapsible_id').empty();
+
+          var total_events = 0;
+
+          if(response_schedule['schedule'][day]!="")
+            total_events += response_schedule['schedule'][day]['events'].length;
+
+          for(var cnt=-1;cnt<total_events;cnt++){
+
+            var temp_html = "";
+
+            if(cnt==-1){
+              temp_html = '<li><div class="collapsible-header">\
+                <div class="row zero-margin-absolute" style="width:100%;">\
+                  <div class="col s5 valign-wrapper zero-margin-absolute">\
+                  <i class="material-icons">add</i>\
+                  <span>Add New Event<span>\
+                    </div>\
+                  </div>\
+                </div>';
+            }
+            else{
+            temp_html = '<li><div class="collapsible-header" style="background-color: #e6e6e6;">\
+              <div class="row zero-margin-absolute" style="width:100%;">\
               <div class="col s5 valign-wrapper zero-margin-absolute">\
                 <i class="material-icons">access_time</i>\
-                <span>12:43 PM</span>\
+                <span>'+response_schedule['schedule'][day]['events'][cnt]['start_time']+'</span>\
                   <span> - </span>\
-                <span>12:43 PM</span>\
+                <span>'+response_schedule['schedule'][day]['events'][cnt]['end_time']+'</span>\
               </div>\
               <div class="col s4 valign-wrapper zero-margin-absolute">\
                 <i class="material-icons">event</i>\
-                  <span>CSC306<span>\
+                  <span>'+response_schedule['schedule'][day]['events'][cnt]['name']+'<span>\
               </div>\
               <div class="col s3 valign-wrapper zero-margin-absolute">\
                 <i class="material-icons">place</i>\
-                  <span>107<span>\
+                  <span>'+response_schedule['schedule'][day]['events'][cnt]['venue']+'<span>\
               </div>\
+            </div>\
             </div>';
-            $(this).append(temp_html);
-          });
-          $(".collapsible-body").each(function() {
-            cnt += 1;
-            var temp_html = '<div class="row zero-margin">\
+          }
+
+            temp_html += '<div class="collapsible-body">\
+              <div class="row zero-margin">\
                 <div class="input-field col s3">\
                   <i class="material-icons prefix white-small-icons">event</i>\
                   <input  id="event_name_id_'+cnt+'" type="text" class="validate white-text">\
@@ -246,19 +262,44 @@ function Get_Monthly_Schedule(){
                   <label for="event_repeat_till_time_id_'+cnt+'">Till Date</label>\
                 </div>\
               </div>\
-              <div class="row zero-margin">\
-                <div class="col s4 offset-s8 zero-margin" >\
-                  <a class="waves-effect waves-light btn-small event_save_class" cnt="'+cnt+'">SAVE</a>\
-                  <a class="waves-effect waves-light btn-small delete-button event_delete_class"  cnt="'+cnt+'">DELETE<i class="material-icons right">delete</i></a>\
-                </div>\
-              </div>';
-            $(this).empty();
-            $(this).append(temp_html);
-          });
+              <div class="row zero-margin">';
+            if(cnt==-1){
+              temp_html += '<div class="col s3 offset-s9 zero-margin" >\
+                <a class="waves-effect waves-light btn-small" id="event_add_id">ADD</a>';
+            }
+            else{
+                  temp_html += '<div class="col s4 offset-s8 zero-margin" >\
+                    <a class="waves-effect waves-light btn-small event_save_class" cnt="'+cnt+'" >SAVE</a>\
+                  <a class="waves-effect waves-light btn-small delete-button event_delete_class"  cnt="'+cnt+'">DELETE<i class="material-icons right">delete</i></a>';
+              }
+            temp_html += '</div>\
+              </div>\
+              </div></li>';
+
+            $('#collapsible_id').append(temp_html);
+            $( ".timepicker" ).keydown(false);
+            $( ".datepicker" ).keydown(false);
+
+            if(cnt!=-1){
+              update_text_data(cnt,day);
+            }
+          }
+
           $('.datepicker').datepicker();
           $('.timepicker').timepicker();
         });
 
+    function update_text_data(cnt,query_day) {
+
+      $('#event_name_id_'+cnt+'').val(response_schedule['schedule'][query_day]['events'][cnt]['name']);
+      $('#event_venue_id_'+cnt+'').val(response_schedule['schedule'][query_day]['events'][cnt]['venue']);
+      $('#event_desc_id_'+cnt+'').val(response_schedule['schedule'][query_day]['events'][cnt]['desc']);
+      $('#event_start_time_id_'+cnt+'').val(response_schedule['schedule'][query_day]['events'][cnt]['start_time']);
+      $('#event_end_time_id_'+cnt+'').val(response_schedule['schedule'][query_day]['events'][cnt]['end_time']);
+
+      M.updateTextFields();
+
+    }
 
     $(document).on("click", ".event_repeat_class", function(){
       if($(this).prop("checked"))
@@ -268,14 +309,170 @@ function Get_Monthly_Schedule(){
     });
 
 
+    function get_time_h(x) {
+     var h = parseInt(parseInt(x[0])*10+ parseInt(x[1]));
+       if(h==12){
+         if(x[6]=="A")
+            h-=parseInt(12);
+       }
+       else{
+         if(x[6]=="P")
+          h+=parseInt(12);
+        }
+      return h.toString();
+    }
+
+    function get_time_m(x) {
+     var  m = parseInt(x[3]*10+ parseInt(x[4]));
+      return m.toString();
+    }
+
+
     $(document).on("click", ".event_save_class", function(){
-        console.log("SAVE");
-        console.log("CNT",$(this).attr("cnt"));
+      var cnt = $(this).attr("cnt");
+      var uuid = response_schedule['schedule'][day]['events'][cnt]['uuid'];
+        temp_dict = {
+          name:$('#event_name_id_'+cnt+'').val(),
+          venue:$('#event_venue_id_'+cnt+'').val(),
+          s_hour:get_time_h($("#event_start_time_id_"+cnt).val()),
+          s_min:get_time_m($("#event_start_time_id_"+cnt).val()),
+          e_hour:get_time_h($("#event_end_time_id_"+cnt).val()),
+          e_min:get_time_m($("#event_end_time_id_"+cnt).val()),
+          description:$('#event_desc_id_'+cnt+'').val(),
+          uuid:uuid,
+          is_deleted:false,
+          is_edited:true,
+        }
+        var ds_uuid =  response_schedule['schedule'][day]['date_uuid'];
+        $.ajax({
+           url: "/Edit_Schedule_Submit/",
+           type: "POST",
+           data: {
+            'ds_uuid':ds_uuid,
+            'ds_year':year.toString(),
+            'ds_month':month.toString(),
+            'ds_day':day.toString(),
+            'event':JSON.stringify(temp_dict),
+            'change_all':false,
+           },
+           success: function(response) {
+             console.log(response);
+
+             if(response['status']==200){
+                M.toast({html: 'Saved successfully'});
+             }
+             else if(response['status']==409){
+                M.toast({html: 'Conflicting!'});
+             }
+             else
+               M.toast({html: 'Some error occurred'});
+           },
+         });
     });
 
+
+
+    $(document).on("click", "#event_add_id", function(){
+
+      var cnt = -1;
+
+      if($('#event_name_id_'+cnt+'').val() == "" || $('#event_venue_id_'+cnt+'').val() == "" || $("#event_start_time_id_"+cnt).val() == "" || $("#event_end_time_id_"+cnt).val() == "" || $('#event_desc_id_'+cnt+'').val() == ""){
+        M.toast({html: 'All inputs are required!'});
+        return ;
+      }
+      if($('#event_repeat_id_'+cnt).prop("checked")){
+        if($('#event_repeat_till_time_id_'+cnt).val()==""){
+          M.toast({html: 'Repeat til date is required!'});
+          return ;
+        }
+      }
+
+        temp_dict = {
+          name:$('#event_name_id_'+cnt+'').val(),
+          venue:$('#event_venue_id_'+cnt+'').val(),
+          s_hour:get_time_h($("#event_start_time_id_"+cnt).val()),
+          s_min:get_time_m($("#event_start_time_id_"+cnt).val()),
+          e_hour:get_time_h($("#event_end_time_id_"+cnt).val()),
+          e_min:get_time_m($("#event_end_time_id_"+cnt).val()),
+          description:$('#event_desc_id_'+cnt+'').val(),
+          uuid:"",
+          is_deleted:false,
+          is_edited:false,
+        }
+        console.log(temp_dict);
+        ds_uuid = "";
+        if(response_schedule['schedule'][day]!="")
+           ds_uuid =  response_schedule['schedule'][day]['date_uuid'];
+        $.ajax({
+           url: "/Edit_Schedule_Submit/",
+           type: "POST",
+           data: {
+            'ds_uuid':ds_uuid,
+            'ds_year':year.toString(),
+            'ds_month':month.toString(),
+            'ds_day':day.toString(),
+            'event':JSON.stringify(temp_dict),
+            'change_all':false,
+           },
+           success: function(response) {
+             console.log(response);
+
+             if(response['status']==200){
+                M.toast({html: 'Created successfully'});
+             }
+             else if(response['status']==409){
+                M.toast({html: 'Conflicting!'});
+             }
+             else
+               M.toast({html: 'Some error occurred'});
+           },
+         });
+    });
+
+
     $(document).on("click", ".event_delete_class", function(){
-        console.log("DELETE");
-        console.log("CNT",$(this).attr("cnt"));
+      var cnt = $(this).attr("cnt");
+      var uuid = response_schedule['schedule'][day]['events'][cnt]['uuid'];
+        temp_dict = {
+          name:$('#event_name_id_'+cnt+'').val(),
+          venue:$('#event_venue_id_'+cnt+'').val(),
+          s_hour:get_time_h($("#event_start_time_id_"+cnt).val()),
+          s_min:get_time_m($("#event_start_time_id_"+cnt).val()),
+          e_hour:get_time_h($("#event_end_time_id_"+cnt).val()),
+          e_min:get_time_m($("#event_end_time_id_"+cnt).val()),
+          description:$('#event_desc_id_'+cnt+'').val(),
+          uuid:uuid,
+          is_deleted:true,
+          is_edited:false,
+        }
+
+        ds_uuid = "";
+        if(response_schedule['schedule'][day]!="")
+           ds_uuid =  response_schedule['schedule'][day]['date_uuid'];
+        $.ajax({
+           url: "/Edit_Schedule_Submit/",
+           type: "POST",
+           data: {
+            'ds_uuid':ds_uuid,
+            'ds_year':year.toString(),
+            'ds_month':month.toString(),
+            'ds_day':day.toString(),
+            'event':JSON.stringify(temp_dict),
+            'change_all':false,
+           },
+           success: function(response) {
+             console.log(response);
+
+             if(response['status']==200){
+                M.toast({html: 'Deleted successfully'});
+             }
+             else if(response['status']==409){
+                M.toast({html: 'Conflicting!'});
+             }
+             else
+               M.toast({html: 'Some error occurred'});
+           },
+         });
     });
 
     function temp(){

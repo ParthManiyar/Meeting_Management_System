@@ -670,43 +670,43 @@ class Get_Monthly_ScheduleAPI(APIView):
 
             response['schedule'] = []
             for i in range(days+1):
-                response['schedule'].append("No Events")
+                response['schedule'].append("")
 
             # uncomment for testing
-            s = Schedule()
-            s.save()
-            d = DailySchedule(date=datetime(year,month,2))
-            d.save()
-
-            d2 = DailySchedule(date=datetime(year,month,4))
-            d2.save()
-
-            e1 = Event(name="Event1",venue="v1",start_time=datetime.now(),end_time=datetime.now()+timedelta(hours=2))
-            e1.save()
-
-            e2 = Event(name="Event2",venue="v2",start_time=datetime.now()+timedelta(hours=1),end_time=datetime.now()+timedelta(hours=2))
-            e2.save()
-
-            e3 = Event(name="Event3",venue="v3",start_time=datetime.now(),end_time=datetime.now()+timedelta(hours=2))
-            e3.save()
-
-            e4 = Event(name="Event3",venue="v3",start_time=datetime.now(),end_time=datetime.now()+timedelta(hours=2))
-            e4.save()
-
-            d.events.add(e1)
-            d.events.add(e2)
-            d.events.add(e3)
-            d.save()
-            d2.events.add(e4)
-            d2.save()
-            s.daily_schedules.add(d)
-            s.daily_schedules.add(d2)
-            s.save()
-
-            user.schedule = s
-            user.save()
-
-            print(user.schedule.daily_schedules.all())
+            # s = Schedule()
+            # s.save()
+            # d = DailySchedule(date=datetime(year,month,2))
+            # d.save()
+            #
+            # d2 = DailySchedule(date=datetime(year,month,4))
+            # d2.save()
+            #
+            # e1 = Event(name="Event1",venue="v1",start_time=datetime.now(),end_time=datetime.now()+timedelta(hours=2))
+            # e1.save()
+            #
+            # e2 = Event(name="Event2",venue="v2",start_time=datetime.now()+timedelta(hours=1),end_time=datetime.now()+timedelta(hours=2))
+            # e2.save()
+            #
+            # e3 = Event(name="Event3",venue="v3",start_time=datetime.now(),end_time=datetime.now()+timedelta(hours=2))
+            # e3.save()
+            #
+            # e4 = Event(name="Event3",venue="v3",start_time=datetime.now(),end_time=datetime.now()+timedelta(hours=2))
+            # e4.save()
+            #
+            # d.events.add(e1)
+            # d.events.add(e2)
+            # d.events.add(e3)
+            # d.save()
+            # d2.events.add(e4)
+            # d2.save()
+            # s.daily_schedules.add(d)
+            # s.daily_schedules.add(d2)
+            # s.save()
+            #
+            # user.schedule = s
+            # user.save()
+            #
+            # print(user.schedule.daily_schedules.all())
 
             if(user.schedule!=None):
 
@@ -747,3 +747,160 @@ class Get_Monthly_ScheduleAPI(APIView):
         return Response(data=response)
 
 Get_Monthly_Schedule = Get_Monthly_ScheduleAPI.as_view()
+
+
+class Edit_Schedule_SubmitAPI(APIView):
+
+    authentication_classes = (CsrfExemptSessionAuthentication,BasicAuthentication)
+
+    def post(self, request, *args, **kwargs):
+        response = {}
+        response["status"] = 500
+
+        try:
+            data = request.data
+            user = request.user
+            user = CustomUser.objects.get(username = user.username)
+
+            response,old_start,old_end,old_name = save_event(user,data,True)
+
+            if response['status'] == 200:
+                if (data['change_all']=="true"):
+                    print(data['change_all'])
+                    till_date = datetime(data['till_year'],data['till_month'],data['till_day'])
+
+                    ds_day = int(data['ds_day'])
+                    ds_month = int(data['ds_month'])
+                    ds_year = int(data['ds_year'])
+                    next_date = datetime(ds_year,ds_month,ds_day)+timedelta(days=7)
+
+                    while(next_date<=till_date):
+                        data['ds_day'] = next_date.day
+                        data['ds_month'] = next_date.month
+                        data['ds_year'] = next_date.year
+                        data['ds_uuid'] = ""
+                        save_event(user,data,False,old_start_time,old_end_time,old_name)
+
+        except Exception as e:
+            error()
+            print("ERROR IN  = Edit_Schedule_SubmitAPI", str(e))
+
+        return Response(data=response)
+
+Edit_Schedule_Submit = Edit_Schedule_SubmitAPI.as_view()
+
+
+def save_event(user,data,isFirst,old_start_time=0,old_end_time=0,old_name=""):
+
+    response = {}
+    response['status'] = 500
+
+    ds_uuid = data['ds_uuid']
+    ds_day = int(data['ds_day'])
+    ds_month = int(data['ds_month'])
+    ds_year = int(data['ds_year'])
+
+    event = json.loads(data['event'])
+
+    if(user.schedule==None):
+
+        s = Schedule()
+        s.save()
+        user.schedule = s
+        user.save()
+
+    ds_date = datetime(ds_year,ds_month,ds_day)
+
+    schedule = user.schedule
+
+    if(ds_uuid==""):
+
+        try:
+            ds = schedule.daily_schedules.all().get(date = ds_date)
+        except:
+            error()
+            ds = DailySchedule(date=datetime(ds_year,ds_month,ds_day))
+            ds.save()
+            schedule.daily_schedules.add(ds)
+    else:
+
+        ds = DailySchedule.objects.get(uuid=ds_uuid)
+
+    start_time = datetime(ds_year,ds_month,ds_day,int(event['s_hour'],int(event['s_min'])))
+    end_time = datetime(ds_year,ds_month,ds_day,int(event['s_hour'],int(event['s_min'])))
+
+    if(event['is_deleted']):
+        if isFirst:
+            try:
+                e = ds.events.all().get(uuid = event['uuid'])
+                old_start_time,old_end_time,old_name = e.start_time,e.end_time,e.name
+                e.delete()
+            except:
+                error()
+                return response,0,0,0
+        else:
+            try:
+                e = ds.events.all().get(start_time=old_start_time,end_time=old_end_time,name=old_name)
+                e.delete()
+            except:
+                error()
+                return response
+        response['status'] = 200
+    else:
+        if(event['is_edited']):
+            if isFirst:
+                try:
+                    e = ds.events.all().get(uuid = event['uuid'])
+                except:
+                    error()
+                    return response,0,0,0
+            else:
+                try:
+                    e = ds.events.all().get(start_time=old_start_time,end_time=old_end_time,name=old_name)
+                except:
+                    error()
+                    return response
+        else:
+            e = Event()
+            e.start_time = start_time
+            e.end_time = end_time
+            e.venue = event['venue']
+            e.name = event['name']
+
+        if isFirst:
+            old_start_time = e.start_time
+            old_end_time = e.end_time
+            old_name = e.name
+
+        if isFirst:
+            clash = ds.events.all().filter(start_time__lt=end_time)
+            clash = clash.filter(end_time__lte=end_time)
+            clash = clash.filter(end_time__gt=start_time).exclude(uuid=e.uuid)
+        else:
+            clash = ds.events.all().filter(start_time__lt=old_end_time)
+            clash = clash.filter(end_time__lte=old_end_time)
+            clash = clash.filter(end_time__gt=old_start_time).exclude(uuid=e.uuid)
+
+        response['clash'] = []
+
+        if(len(clash)>0):
+            for event in clash:
+                response['clash'].append(event.name)
+            return response,0,0,0
+        else:
+
+            e.name = event['name']
+            e.venue = event['venue']
+            e.start_time = start_time
+            e.end_time = end_time
+            e.description = event['description']
+            e.save()
+
+            if (not event['is_edited']):
+                ds.events.add(e)
+            response['status']=200
+
+    if isFirst:
+        return response,old_start_time,old_end_time,old_name
+    else:
+        return response

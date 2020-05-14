@@ -2,11 +2,17 @@
 {% block content %}
 {% load static %}
 
+  <br><br>
+
 <div class="row center">
 
   <div class="col s3 offset-s1">
 
-    <br><br><br>
+    <div class="row">
+      <div class="col s5">
+          <a href="/create/group" id="create_group_button_id" class="waves-effect waves-light btn" ><i class="material-icons left">group_add</i>Create</a>
+      </div>
+    </div>
 
     <div class="row" style="padding-right:0px;margin-right:0px">
       <div class="col s12">
@@ -23,13 +29,13 @@
 
   <div class="col s6 offset-s1">
 
-    <br><br><br>
+    <div class="row">
+      <div class="col s12">
+          <span class="left grey-text">Meetings can be created from respective groups*</span>
+      </div>
+    </div>
 
-    <!-- <a class="btn-floating btn-large waves-effect waves-light modal-trigger" style="background-color:#003d72" href="#meeting_modal" ><i class="material-icons">add</i></a> -->
-    <!-- <h4> Meetings </h4> -->
-
-
-    <div class="row" style="padding-right:0px;margin-right:0px">
+    <div class="row" style="padding-right:0px;margin-right:0px;padding-top:0.7em;">
       <div class="col s12">
         <ul class="tabs" style="background-color:#003d72;">
           <li class="tab col s4"><a href="#ongoing_tab_id" >Onging Meetings</a></li>

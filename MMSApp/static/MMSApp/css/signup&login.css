@@ -295,3 +295,15 @@
 .white-text{
   color:white !important;
 }
+
+.plus_extra{
+  text-align: center;
+  font-size:0.8em;
+  padding-top:3px;
+}
+
+
+.meeting-box{
+  padding:10px;
+  background-color: #f2f2f2;
+}

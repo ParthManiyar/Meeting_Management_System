@@ -32,4 +32,5 @@ urlpatterns = [
     # Schedule
     path('schedule/',views.Get_Schedule),
     path('Get_Monthly_Schedule/',views.Get_Monthly_Schedule),
+    path('Edit_Schedule_Submit/',views.Edit_Schedule_Submit),
 ]

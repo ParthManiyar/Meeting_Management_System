@@ -50,13 +50,16 @@
     </div>
 
     <div id="ongoing_tab_id" class="fancyScroll" style="max-height:500px;overflow-y:auto;">
-        HEY1
+      <div class="container" style="width:92%;">
+      </div>
     </div>
     <div id="upcoming_tab_id" class="fancyScroll" style="max-height:500px;overflow-y:auto;">
-        HEY2
+      <div class="container" style="width:92%;">
+      </div>
     </div>
     <div id="past_tab_id" class="fancyScroll" style="max-height:500px;overflow-y:auto;">
-        HEY3
+      <div class="container" style="width:92%;">
+      </div>
     </div>
 
   </div>
@@ -109,13 +112,75 @@
                 </div>\
               </div><hr>';
             }
+
             $("#member_list_id").append(temp);
             if(response['isAdmin']=="1")
               jQuery('#edit_group_button_id').show()
+
+            temp = "";
+
+            for (var i=0;i<response['past_meets'].length;i++){
+            temp  += '<div class="card horizontal">\
+                <div class="card-stacked meeting-box">\
+                  <div class="row zero-margin">\
+                  <h5 style="padding-left:1em;text-decoration:underline;">'+response['past_meets'][i]["name"]+'</h5>\
+                 </div>\
+                  <div class="card-content " style="padding-left:2em;padding-bottom:0px;">\
+                    <div class="row"><div class="col s4 valign-wrapper"><i class="material-icons ">access_time</i><span style="padding-left:1em;">'+response['past_meets'][i]["start_time"]+' </span> - <span>'+response['past_meets'][i]["end_time"]+'</span></div>\
+                    <div class="col s4 valign-wrapper"><i class="material-icons">place</i> <span style="padding-left:1em;">'+response['past_meets'][i]["venue"]+'</span></div>\
+                    <div class="col s4 valign-wrapper"><i class="material-icons">event_note</i> <span style="padding-left:1em;">'+response['past_meets'][i]["agenda"]+'</span></div></div>\
+                  </div>\
+                  <div class="card-action">\
+                    <a href="/meetings/'+response['past_meets'][i]["uuid"]+'" class="waves-effect waves-light btn"><i class="material-icons left">search</i>View</a>\
+                  </div>\
+                </div>\
+              </div>';
+            }
+
+            $("#past_tab_id").children().append(temp);
+            temp = "";
+            for (var i=0;i<response['ongoing_meets'].length;i++){
+            temp  += '<div class="card horizontal">\
+                <div class="card-stacked meeting-box">\
+                  <div class="row zero-margin">\
+                  <h5 style="padding-left:1em;text-decoration:underline;">'+response['ongoing_meets'][i]["name"]+'</h5>\
+                 </div>\
+                  <div class="card-content " style="padding-left:2em;padding-bottom:0px;">\
+                    <div class="row"><div class="col s4 valign-wrapper"><i class="material-icons ">access_time</i><span style="padding-left:1em;">'+response['ongoing_meets'][i]["start_time"]+' </span> - <span>'+response['ongoing_meets'][i]["end_time"]+'</span></div>\
+                    <div class="col s4 valign-wrapper"><i class="material-icons">place</i> <span style="padding-left:1em;">'+response['ongoing_meets'][i]["venue"]+'</span></div>\
+                    <div class="col s4 valign-wrapper"><i class="material-icons">event_note</i> <span style="padding-left:1em;">'+response['ongoing_meets'][i]["agenda"]+'</span></div></div>\
+                  </div>\
+                  <div class="card-action">\
+                    <a href="/meetings/'+response['ongoing_meets'][i]["uuid"]+'" class="waves-effect waves-light btn"><i class="material-icons left">search</i>View</a>\
+                  </div>\
+                </div>\
+              </div>';
+            }
+
+            $("#ongoing_tab_id").children().append(temp);
+            temp ="";
+            for (var i=0;i<response['upcoming_meets'].length;i++){
+            temp  += '<div class="card horizontal">\
+                <div class="card-stacked meeting-box">\
+                  <div class="row zero-margin">\
+                  <h5 style="padding-left:1em;text-decoration:underline;">'+response['upcoming_meets'][i]["name"]+'</h5>\
+                 </div>\
+                  <div class="card-content " style="padding-left:2em;padding-bottom:0px;">\
+                    <div class="row"><div class="col s4 valign-wrapper"><i class="material-icons ">access_time</i><span style="padding-left:1em;">'+response['upcoming_meets'][i]["start_time"]+' </span> - <span>'+response['upcoming_meets'][i]["end_time"]+'</span></div>\
+                    <div class="col s4 valign-wrapper"><i class="material-icons">place</i> <span style="padding-left:1em;">'+response['upcoming_meets'][i]["venue"]+'</span></div>\
+                    <div class="col s4 valign-wrapper"><i class="material-icons">event_note</i> <span style="padding-left:1em;">'+response['upcoming_meets'][i]["agenda"]+'</span></div></div>\
+                  </div>\
+                  <div class="card-action">\
+                    <a href="/meetings/'+response['upcoming_meets'][i]["uuid"]+'" class="waves-effect waves-light btn"><i class="material-icons left">search</i>View</a>\
+                  </div>\
+                </div>\
+              </div>';
+            }
+
+            $("#upcoming_tab_id").children().append(temp);
           }
         },
       });
-
   });
 
 </script>
