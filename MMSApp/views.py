@@ -734,6 +734,7 @@ class Get_Monthly_ScheduleAPI(APIView):
                             temp['start_time'] = event.get_start_time()
                             temp['end_time'] = event.get_end_time()
                             temp['venue'] = event.venue
+                            temp['description'] = event.description
                             response['schedule'][i]['events'].append(temp)
 
             response['status']=200
@@ -779,7 +780,7 @@ class Edit_Schedule_SubmitAPI(APIView):
                         data['ds_month'] = next_date.month
                         data['ds_year'] = next_date.year
                         data['ds_uuid'] = ""
-                        save_event(user,data,False,old_start_time,old_end_time,old_name)
+                        save_event(user,data,False,old_start,old_end,old_name)
 
         except Exception as e:
             error()
@@ -794,6 +795,8 @@ def save_event(user,data,isFirst,old_start_time=0,old_end_time=0,old_name=""):
 
     response = {}
     response['status'] = 500
+
+    print(data)
 
     ds_uuid = data['ds_uuid']
     ds_day = int(data['ds_day'])
@@ -828,7 +831,7 @@ def save_event(user,data,isFirst,old_start_time=0,old_end_time=0,old_name=""):
 
     # print(event['s_hour'])
 
-    start_time = datetime(ds_year,ds_month,ds_day,int(event['s_hour'],int(event['s_min'])))
+    start_time = datetime(ds_year,ds_month,ds_day,int(event['s_hour']),int(event['s_min']))
     end_time = datetime(ds_year,ds_month,ds_day,int(event['e_hour']),int(event['e_min']))
     # end_time = start_time+timedelta(hours=1)
     print(start_time,end_time)
@@ -910,3 +913,68 @@ def save_event(user,data,isFirst,old_start_time=0,old_end_time=0,old_name=""):
         return response,old_start_time,old_end_time,old_name
     else:
         return response
+
+
+class Get_User_MeetingsAPI(APIView):
+
+    authentication_classes = (CsrfExemptSessionAuthentication,BasicAuthentication)
+
+    def post(self, request, *args, **kwargs):
+        response = {}
+        response["status"] = 500
+
+        try:
+            data = request.data
+            user = request.user
+            user = CustomUser.objects.get(username = user.username)
+
+            response['past_meets'] = []
+            response['ongoing_meets'] = []
+            response['upcoming_meets'] = []
+
+            groups = Group.objects.filter(members__username=user.username)
+
+            meetings = Meeting.objects.filter(group__in=groups)
+
+
+            past_meets = meetings.filter(end_time__lte = datetime.now())
+            ongoing = meetings.filter(start_time__lte = datetime.now(), end_time__gte = datetime.now())
+            upcoming = meetings.filter(start_time__gte = datetime.now())
+
+            for meet in past_meets:
+                temp = {}
+                temp['uuid'] = meet.uuid
+                temp['name'] = meet.name
+                temp['agenda'] = meet.agenda
+                temp['meeting_date'] = meet.get_meeting_date()
+                temp['start_time'] = meet.get_start_time()
+                temp['end_time'] = meet.get_end_time()
+                response['past_meets'].append(temp)
+
+            for meet in ongoing:
+                temp = {}
+                temp['uuid'] = meet.uuid
+                temp['name'] = meet.name
+                temp['agenda'] = meet.agenda
+                temp['meeting_date'] = meet.get_meeting_date()
+                temp['start_time'] = meet.get_start_time()
+                temp['end_time'] = meet.get_end_time()
+                response['ongoing_meets'].append(temp)
+
+            for meet in upcoming:
+                temp = {}
+                temp['uuid'] = meet.uuid
+                temp['name'] = meet.name
+                temp['agenda'] = meet.agenda
+                temp['meeting_date'] = meet.get_meeting_date()
+                temp['start_time'] = meet.get_start_time()
+                temp['end_time'] = meet.get_end_time()
+                response['upcoming_meets'].append(temp)
+            
+        except Exception as e:
+            error()
+            print("ERROR IN  = Edit_Schedule_SubmitAPI", str(e))
+
+        return Response(data=response)
+
+Get_User_Meetings = Get_User_MeetingsAPI.as_view()
