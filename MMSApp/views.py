@@ -627,6 +627,8 @@ class Get_Meeting_DetailsAPI(APIView):
             response['meeting_date'].append(meet.meeting_date.month)
             response['meeting_date'].append(meet.meeting_date.year)
 
+            response['group_uuid'] = meet.group.uuid
+
             print(response['meeting_date'])
 
             response['status']=200
@@ -1166,7 +1168,7 @@ class Get_Meeting_ResourcesAPI(APIView):
 
             meeting_uuid = data['meeting_uuid']
             meeting = Meeting.objects.get(uuid = meeting_uuid)
-            
+
             if user in list(meeting.group.members.all()):
                 response['resources'] = []
                 # print("here")
@@ -1188,6 +1190,7 @@ class Get_Meeting_ResourcesAPI(APIView):
 
 Get_Meeting_Resources = Get_Meeting_ResourcesAPI.as_view()
 
+<<<<<<< HEAD
 class Get_NotificationsAPI(APIView):
 
     authentication_classes = (CsrfExemptSessionAuthentication,BasicAuthentication)
@@ -1389,3 +1392,69 @@ class Leave_GroupAPI(APIView):
         return Response(data=response)
 
 Leave_Group = Leave_GroupAPI.as_view()
+
+
+class Get_Free_Time_SlotsAPI(APIView):
+
+    authentication_classes = (CsrfExemptSessionAuthentication,BasicAuthentication)
+
+    def post(self, request, *args, **kwargs):
+        response = {}
+        response["status"] = 500
+
+        try:
+            data = request.data
+            user = request.user
+            user = CustomUser.objects.get(username = user.username)
+
+            group_uuid = data['group_uuid']
+            group = Group.objects.get(uuid = group_uuid)
+            duration = int(data['duration'])  # In minutes
+            year = int(data['year'])
+            month = int(data['month'])
+            day = int(data['day'])
+            delta = int(data['delta'])  # In minutes
+            meeting_date = datetime(year,month,day)
+
+            assert duration<=12*60  # assuming duation is 8 to  20
+
+            start_time  = datetime( year, month, day , 8 , 0 )
+            end_time  = datetime( year, month, day, 8+duration//60 , duration%60 )
+
+            end_of_day =  datetime( year, month, day, 20 , 0 )
+
+            if user in group.members.all():
+                response['time_slots'] = []
+                while end_time<=end_of_day:
+                    flag = True
+                    for user in group.members.all():
+                        try:
+                            for event in user.schedule.daily_schedules.all().get(date = meeting_date).events.all():
+                                start_time2 = datetime( year, month, day, event.start_time.hour, event.start_time.minute )
+                                end_time2 = datetime( year, month, day, event.end_time.hour, event.end_time.minute )
+                                if end_time<=start_time2 or end_time2<=start_time:
+                                    continue
+                                else:
+                                    flag = False
+                                    break
+                            if flag==False:
+                                break
+                        except:
+                            pass
+                    if flag == True:
+                        time_slot = {}
+                        time_slot['start_time'] = start_time.strftime("%I:%M %p" )
+                        time_slot['end_time'] = end_time.strftime("%I:%M %p" )
+                        response['time_slots'].append(time_slot)
+
+                    start_time = start_time + timedelta(minutes = delta)
+                    end_time = end_time + timedelta(minutes = delta)
+                response['status'] = 200
+        except Exception as e:
+            error()
+            print("ERROR IN  = Get_Free_Time_SlotsAPI", str(e))
+
+        return Response(data=response)
+
+Get_Free_Time_Slots = Get_Free_Time_SlotsAPI.as_view()
+>>>>>>> e8e459fbed27b44879122fd92b3f7b46b8818491

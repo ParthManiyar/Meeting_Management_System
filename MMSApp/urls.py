@@ -25,6 +25,7 @@ urlpatterns = [
     path('Get_User_Groups/',views.Get_User_Groups),
     path('groups/<str:group_uuid>/', views.Single_Group),
     path('Get_Group_Details/', views.Get_Group_Details),
+    path('Get_Free_Time_Slots/', views.Get_Free_Time_Slots),
     # Meeting
     path('create/meeting/<str:group_uuid>/', views.Create_Meeting),
     path('edit/meeting/<str:meeting_uuid>/', views.Edit_Meeting),
