@@ -13,6 +13,7 @@ urlpatterns = [
     path('signup_submit/', views.Signup_Submit),
     # Users
     path('Get_All_Users/', views.Get_All_Users),
+    path('profile/<str:username>/', views.Profile),
     # Group
     path('create/group/', views.Create_Group),
     path('edit/group/<str:group_uuid>/', views.Edit_Group),

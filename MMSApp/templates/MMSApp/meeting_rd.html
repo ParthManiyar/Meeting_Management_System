@@ -7,7 +7,7 @@
 <div class="container" >
   <div class="row">
     <div class="col s2">
-        <a href="#!" id="leave_group_button_id" class="waves-effect waves-light btn delete-button"><i class="material-icons left">delete</i>Delete</a>
+        <a href="#!" id="delete_meeting_button_id" class="waves-effect waves-light btn delete-button"><i class="material-icons left">delete</i>Delete</a>
     </div>
     <div class="col s2">
         <a href="#!" id="edit_meeting_button_id" class="waves-effect waves-light btn" ><i class="material-icons left">create</i>Edit</a>
@@ -16,10 +16,9 @@
 <div class="row" style="padding-right:0px;margin-right:0px">
   <div class="col s12" style="padding-left:0px;padding-right:0px">
     <ul class="tabs" style="background-color:#003d72;" >
-      <li class="tab col s3 active"><a href="#info_tab_id" >INFO</a></li>
-      <li class="tab col s3"><a href="#attendees_tab_id">ATTENDEES</a></li>
-      <li class="tab col s3"><a href="#chat_tab_id" >CHAT</a></li>
-      <li class="tab col s3"><a href="#resources_tab_id" >RESOURCES</a></li>
+      <li class="tab col s4 active"><a href="#info_tab_id" >INFO</a></li>
+      <li class="tab col s4"><a href="#attendees_tab_id">ATTENDEES</a></li>
+      <li class="tab col s4"><a href="#resources_tab_id" >RESOURCES</a></li>
     </ul>
   </div>
 </div>
@@ -28,17 +27,12 @@
   <div class="fancyScroll" style="max-height:500px;overflow-y:auto">
   </div>
 </div>
-<div id="attendees_tab_id">
-  <div class="fancyScroll" style="max-height:500px;overflow-y:auto">
-      <p><a href="/profile/">XYZ</a></p>
-      <p><a href="/profile/">XYZ</a></p>
-  </div>
-</div>
-<div id="chat_tab_id">
-  <div class="fancyScroll" style="height:500px;overflow-y:auto">
 
+<div id="attendees_tab_id">
+  <div class="fancyScroll container" style="max-height:500px;overflow-y:auto">
   </div>
 </div>
+
 <div id="resources_tab_id">
     <div class = "row">
        <div class = "file-field input-field col s4">
@@ -55,9 +49,18 @@
          <button class="waves-effect waves-light btn" id="add_resource_id"><i class="material-icons left">add</i>Add</button>
        </div>
     </div>
-  <div class="fancyScroll" style="max-height:400px;overflow-y:auto">
-    <p><a href="files/">XYZ</a></p>
-    <p><a href="files/">XYZ</a></p>
+  <div class="fancyScroll" id="append_resources_here_id" style="max-height:400px;overflow-y:auto">
+      <div class="row meeting-box" style="width:98%;">
+        <div class="col s5">
+          <span>File Name</span>
+        </div>
+        <div class="col s4">
+          <a href="/ADD PATH HERE"><i class="material-icons left white-text">add</i>Member Name</a>
+        </div>
+        <div class="col s3">
+          <a href="/ADD PATH HERE"><i class="material-icons left white-text">file_download</i>View/Download</a>
+        </div>
+      </div>
   </div>
 </div>
 
@@ -136,7 +139,9 @@ $(document).ready(function(){
           type: 'POST',
           success: function(response){
             console.log(response);
-            Get_Meeting_Resources();
+            if(response['status']==200){
+                Get_Meeting_Resources();
+            }
           },
           error: function(xhr, a, b){
             console.log("Some error!");
@@ -145,20 +150,60 @@ $(document).ready(function(){
     }
 
     function Get_Meeting_Resources(){
-      $.ajax({
-          url: "/Get_Meeting_Resources/",
-          type: "POST",
-          data: {
-            'meeting_uuid' : get_uuid(),
-          },
-          success: function(response) {
-            console.log(response);
-            if(response['status']==200){
-              break;
-            }
-          },
-        });
+      // $.ajax({
+      //     url: "/Get_Meeting_Resources/",
+      //     type: "POST",
+      //     data: {
+      //       'meeting_uuid' : get_uuid(),
+      //     },
+      //     success: function(response) {
+      //       console.log(response);
+      //       if(response['status']==200){
+      //         $("#append_resources_here_id").children().empty();
+        
+      //         $('#append_resources_here_id').children().append(temp);
+      //       }
+      //     },
+      //   });
     }
+
+    // $.ajax({
+    //     url: '/GET_ATTENDEES/',
+    //     data: {
+    //
+    //     },
+    //     type: 'POST',
+    //     success: function(response){
+    //       console.log(response);
+            // var temp = '<div class="row"><span><a href="/profile/XYZ">XYZ</a></span>\
+            // <span class="right isadmin-class">Admin<span></div>';
+            //
+            // $("#attendees_tab_id").children().append(temp);
+    //     },
+    //     error: function(xhr, a, b){
+    //       console.log("Some error!");
+    //     }
+    //   });
+
+    $("#delete_meeting_button_id").click(function (){
+
+      console.log("ADD DELETE API HERE!");
+      // $.ajax({
+      //     url: '/DELETEs/',
+      //     data: {
+      //      'meeting_uuid' : get_uuid(),
+      //     },
+      //     type: 'POST',
+      //     success: function(response){
+      //        M.toast({html:"Successfully Deleted!"});
+      //        window.location.pathname = "groups/"+group_uuid;
+      //     },
+      //     error: function(xhr, a, b){
+      //       console.log("Some error!");
+      //     }
+      //   });
+    });
+
   });
 
 </script>

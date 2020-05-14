@@ -58,6 +58,11 @@
           return;
         }
 
+        if($("#username_signup_id").val().toLowerCase() != $("#username_signup_id").val()){
+          M.toast({html:"Username can only have lower case characters!"});
+          return;
+        }
+
        $.ajax({
             url: "/signup_submit/",
             type: "POST",

@@ -62,6 +62,12 @@ def Logout(request):
     logout(request)
     return HttpResponseRedirect('/login/')
 
+# Users
+
+@login_required(login_url='/login/')
+def Profile(request,username):
+    return render(request,'MMSApp/profile.html')
+
 # Group
 
 @login_required(login_url='/login/')
