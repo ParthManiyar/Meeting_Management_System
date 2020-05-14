@@ -1144,7 +1144,9 @@ class Get_Free_Time_SlotsAPI(APIView):
                     for user in group.members.all():
                         try:
                             for event in user.schedule.daily_schedules.all().get(date = meeting_date).events.all():
-                                if end_time<=event.start_time or event.end_time<=start_time:
+                                start_time2 = datetime( year, month, day, event.start_time.hour, event.start_time.minute )
+                                end_time2 = datetime( year, month, day, event.end_time.hour, event.end_time.minute )
+                                if end_time<=start_time2 or end_time2<=start_time:
                                     continue
                                 else:
                                     flag = False
@@ -1155,8 +1157,8 @@ class Get_Free_Time_SlotsAPI(APIView):
                             pass
                     if flag == True:
                         time_slot = {}
-                        time_slot['start_time'] = start_time.strftime("%H:%M")
-                        time_slot['end_time'] = end_time.strftime("%H:%M")
+                        time_slot['start_time'] = start_time.strftime("%I:%M %p" )
+                        time_slot['end_time'] = end_time.strftime("%I:%M %p" )
                         response['time_slots'].append(time_slot)
 
                     start_time = start_time + timedelta(minutes = delta)

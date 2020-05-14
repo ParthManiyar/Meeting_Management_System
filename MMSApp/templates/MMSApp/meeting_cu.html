@@ -35,24 +35,39 @@
     <br>
 
     <div class="row">
-      <div class="input-field col s3 offset-s1">
-        <i class="material-icons prefix">timelapse</i>
-        <input class="validate" id="meeting_duration_id" type="text" style="color:white">
-        <label for="meeting_duration_id">Duration (Minutes)</label>
-      </div>
-      <div class="col s4" style="padding-top:1.5em;">
-        <a class="waves-effect waves-light btn" id="common_time_slot_id">Get Common Time Slots</a>
-      </div>
-    </div>
+      <div class="col s7 offset-s1">
+        <div class="row">
 
-
-
-    <div class="row">
-      <div class="col s2 offset-s3">
-          <input placeholder="From" type="text" class="timepicker" id="meeting_from_time_id" style="color:white">
+            <div class="input-field col s5">
+              <i class="material-icons prefix">timelapse</i>
+                <input class="validate" id="meeting_duration_id" type="text" style="color:white">
+                <label for="meeting_duration_id">Duration (Minutes)</label>
+            </div>
+            <div class="col s4 offset-s1" style="padding-top:1.5em;">
+                  <a class="waves-effect waves-light btn" id="common_time_slot_id">Get Common Time Slots</a>
+            </div>
+          </div>
+          <div class="row">
+            <div class="input-field col s4 ">
+              <i class="material-icons prefix">access_time</i>
+                <input placeholder="From" type="text" class="validate" id="meeting_from_time_id" style="color:white">
+            </div>
+            <div class="input-field col s4 offset-s2">
+              <i class="material-icons prefix">access_time</i>
+                <input placeholder="To" type="text" class="validate" id="meeting_to_time_id" style="color:white">
+            </div>
+          </div>
       </div>
-      <div class="col s2 offset-s2">
-          <input placeholder="To" type="text" class="timepicker" id="meeting_to_time_id" style="color:white">
+      <div class="col s4">
+        <div class="fancyscrollreverse" id="all_slots_id" style="height:200px;width:90%;overflow-y:auto">
+          <!-- <p>
+            <label>
+              <input name="common_time_slot" class="suggestions-class"  type="radio" />
+              <span ><span  st="12:00 PM" >12:00 PM</span> -
+              <span en="12:00 PM" >12:00 PM</span></span>
+            </label>
+          </p> -->
+        </div>
       </div>
     </div>
 
@@ -197,13 +212,7 @@ $( "#meeting_from_time_id" ).keydown(false);
      e_hour = get_time_h($("#meeting_to_time_id").val());
      e_min = get_time_m($("#meeting_to_time_id").val());
 
-     duration = get_duration(s_hour,s_min,e_hour,e_min);
-
-     if(duration <= 0){
-       M.toast({html: 'Time duration must be positive!'});
-       console.log(duration);
-      return;
-     }
+     duration = $("#meeting_duration_id").val();
 
      var instance = M.Datepicker.getInstance(meeting_date_id);
      var ins_string = instance.toString();
@@ -306,6 +315,7 @@ $( "#meeting_from_time_id" ).keydown(false);
                    $("#meeting_name_id").val(response['name']);
                    $("#meeting_agenda_id").val(response['agenda']);
                    $("#meeting_venue_id").val(response['venue']);
+                   $("#meeting_duration_id").val(response['duration']);
 
                    var to12hrStringval = to12hrString(response['start_time'][0],response['start_time'][1]);
 
@@ -369,9 +379,41 @@ $( "#meeting_from_time_id" ).keydown(false);
            },
            success: function(response) {
              console.log(response);
+             if(response['status']==200){
+               $("#all_slots_id").empty();
+               for (var i=0;i<response['time_slots'].length;i++){
+
+                 var st = response['time_slots'][i]["start_time"];
+                 var en = response['time_slots'][i]["end_time"];
+
+                var temp = '<p>\
+                   <label>\
+                     <input name="common_time_slot" class="suggestions-class" type="radio"/>\
+                     <span ><span st="'+st+'" >'+st+'</span> -\
+                     <span en="'+en+'" >'+en+'</span></span>\
+                   </label>\
+                 </p>';
+
+                 $("#all_slots_id").append(temp);
+               }
+               if(response['time_slots'].length == 0){
+                 $("#all_slots_id").append("<p>No common time slots!</p>");
+               }
+             }
            },
          });
     }
+
+    $(document).on("click",".suggestions-class",function(){
+        var st = $(this).next().children().attr("st");
+        var en = $(this).next().children().last().attr("en");
+
+        $("#meeting_to_time_id").val(en);
+        $("#meeting_from_time_id").val(st);
+
+        jQuery('html,body').animate({scrollTop:0},0);
+    });
+
 
 });
 

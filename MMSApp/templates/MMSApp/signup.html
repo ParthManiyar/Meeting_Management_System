@@ -63,6 +63,16 @@
           return;
         }
 
+      var email = $("#email_signup_id").val();
+      var ahduni = "@ahduni.edu.in";
+
+      var n = email.indexOf(ahduni);
+
+      if(n==-1){
+        M.toast({html:"Only Ahmedabad University accounts supported!"});
+        return;
+      }
+
        $.ajax({
             url: "/signup_submit/",
             type: "POST",
