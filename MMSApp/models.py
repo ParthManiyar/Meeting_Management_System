@@ -32,7 +32,7 @@ class Event(models.Model):
 
     def __str__(self):
         return self.name
-    
+
     def get_start_time(self):
         return self.start_time.strftime('%I:%M %p')
 
@@ -54,7 +54,7 @@ class DailySchedule(models.Model):
 
     def __str__(self):
         return str(self.date)
-    
+
 
     def save(self, *args, **kwargs):
         if self.pk==None:
@@ -132,8 +132,9 @@ class ChatRoom(models.Model):
 
 class Resource(models.Model):
 
-    rfile       = models.FileField()
+    rfile       = models.FileField(upload_to="resources")
     owner       = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    name        = models.CharField(max_length=200,blank=True,null=True)
     upload_time = models.DateTimeField(auto_now=True)
     uuid = models.CharField(max_length=100,default = "", editable=False)
 
@@ -189,7 +190,7 @@ class Meeting(models.Model):
 
     def get_meeting_date(self):
         return self.start_time.strftime('%B %d, %Y')
-    
+
     def get_start_time(self):
         return self.start_time.strftime('%I:%M %p')
 

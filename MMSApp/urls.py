@@ -30,6 +30,10 @@ urlpatterns = [
     path('Get_Meeting_Details/',views.Get_Meeting_Details),
     path('Edit_Meeting_Submit/',views.Edit_Meeting_Submit),
     path('Get_User_Meetings/',views.Get_User_Meetings),
+    # Resource
+    path('Resource_Submit/',views.Resource_Submit),
+    path('Resource_Delete/',views.Resource_Delete),
+    path('Get_Meeting_Resources/',views.Get_Meeting_Resources),
     # Schedule
     path('schedule/',views.Get_Schedule),
     path('Get_Monthly_Schedule/',views.Get_Monthly_Schedule),

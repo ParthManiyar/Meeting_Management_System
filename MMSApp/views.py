@@ -584,6 +584,9 @@ class Get_Meeting_DetailsAPI(APIView):
             response['start_time']=[]
             response['end_time']=[]
             response['meeting_date']=[]
+            response['meeting_date_str'] = meet.get_meeting_date()
+            response['start_time_str'] = meet.get_start_time()
+            response['end_time_str'] = meet.get_end_time()
             response['duration']=meet.duration
             response['venue']=meet.venue
 
@@ -980,3 +983,111 @@ class Get_User_MeetingsAPI(APIView):
         return Response(data=response)
 
 Get_User_Meetings = Get_User_MeetingsAPI.as_view()
+
+
+class Resource_SubmitAPI(APIView):
+
+    authentication_classes = (CsrfExemptSessionAuthentication,BasicAuthentication)
+
+    def post(self, request, *args, **kwargs):
+        response = {}
+        response["status"] = 500
+
+        try:
+            data = request.data
+            user = request.user
+            user = CustomUser.objects.get(username = user.username)
+
+            meeting_uuid = data['meeting_uuid']
+            resource = data['resource']
+            name = data['name']
+
+            meeting = Meeting.objects.get(uuid = meeting_uuid)
+            group = meeting.group
+
+            if user in group.admins.all():
+                r = Resource(owner=user,rfile=resource,name=name)
+                meeting.resources.add(r)
+                response['status'] = 200
+                response['file_owner'] = user.username
+                response['file_path'] = settings.MEDIA_URL+r.rfile.name
+                response['file_name'] = r.name
+            else:
+                response['status'] = 400
+
+        except Exception as e:
+            error()
+            print("ERROR IN  = resources submit api", str(e))
+
+        return Response(data=response)
+
+Resource_Submit = Resource_SubmitAPI.as_view()
+
+
+class Resource_DeleteAPI(APIView):
+
+    authentication_classes = (CsrfExemptSessionAuthentication,BasicAuthentication)
+
+    def post(self, request, *args, **kwargs):
+        response = {}
+        response["status"] = 500
+
+        try:
+            data = request.data
+            user = request.user
+            user = CustomUser.objects.get(username = user.username)
+
+            meeting_uuid = data['meeting_uuid']
+            r_uuid = data['r_uuid']
+
+            meeting = Meeting.objects.get(uuid = meeting_uuid)
+            group = meeting.group
+
+            if user in group.admins:
+                r = Resource.objects.get(uuid=r_uuid)
+                r.delete()
+                response['status'] = 200
+            else:
+                response['status'] = 200
+        except Exception as e:
+            error()
+            print("ERROR IN  = Resource_DeleteAPI", str(e))
+
+        return Response(data=response)
+
+Resource_Delete = Resource_DeleteAPI.as_view()
+
+
+class Get_Meeting_ResourcesAPI(APIView):
+
+    authentication_classes = (CsrfExemptSessionAuthentication,BasicAuthentication)
+
+    def post(self, request, *args, **kwargs):
+        response = {}
+        response["status"] = 500
+
+        try:
+            data = request.data
+            user = request.user
+            user = CustomUser.objects.get(username = user.username)
+
+            meeting_uuid = data['meeting_uuid']
+            meeting = Meeting.objects.get(uuid = meeting_uuid)
+
+            if user in meeting.group.members.all():
+                response['resources'] = []
+                resources = meeting.resources
+                for r in resources:
+                    temp = {}
+                    temp['file_owner'] = user.username
+                    temp['file_path'] = settings.MEDIA_URL+r.rfile.name
+                    temp['file_name'] = r.name
+                    response['resources'].append(temp)
+                response['status'] = 200
+        except Exception as e:
+            error()
+            print("ERROR IN  = Get_Meeting_ResourcesAPI", str(e))
+
+        return Response(data=response)
+
+Get_Meeting_Resources = Get_Meeting_ResourcesAPI.as_view()

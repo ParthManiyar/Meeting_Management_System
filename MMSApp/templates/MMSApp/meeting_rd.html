@@ -26,10 +26,6 @@
 
 <div id="info_tab_id">
   <div class="fancyScroll" style="max-height:500px;overflow-y:auto">
-    <!-- <p><span class="grey-text">Group:</span> <span id="group_name_id">XYZ</span> </p>
-    <p><span class="grey-text">Date:</span> <span id="group_date_id">XYZ</span> </p>
-    <p><span class="grey-text">Start time:</span> <span id="group_start_time_id">XYZ</span>  </p>
-    <p><span class="grey-text">End time:</span>  <span id="group_end_time_id">XYZ</span></p> -->
   </div>
 </div>
 <div id="attendees_tab_id">
@@ -45,15 +41,18 @@
 </div>
 <div id="resources_tab_id">
     <div class = "row">
-       <div class = "file-field input-field col s3">
+       <div class = "file-field input-field col s4">
           <div class = "btn">
              <span>Browse</span>
-             <input id="add_file_button_id" type = "file" multiple />
+             <input id="add_file_button_id" type = "file"/>
           </div>
           <div class = "file-path-wrapper">
-             <input class = "file-path validate" type = "text"
+             <input class = "file-path validate" id="file_name_id" type = "text"
                 placeholder = "Upload files" />
           </div>
+       </div>
+       <div class="col s2 offset-s1" style="padding-top:1em;">
+         <button class="waves-effect waves-light btn" id="add_resource_id"><i class="material-icons left">add</i>Add</button>
        </div>
     </div>
   <div class="fancyScroll" style="max-height:400px;overflow-y:auto">
@@ -66,6 +65,8 @@
 
 
 <script type="text/javascript">
+
+$(document).ready(function(){
 
   function get_uuid(){
     uuid = window.location.pathname;
@@ -96,7 +97,7 @@
                 <div class="col s4 valign-wrapper"><i class="material-icons">date_range</i> <span style="padding-left:1em;">'+response["meeting_date_str"]+'</span></div>\
               </div>\
                 <div class="row">\
-                <div class="col s4 valign-wrapper"><i class="material-icons">timelapse</i><span style="padding-left:1em;">'+response["duration"]+'</span></div>\
+                <div class="col s4 valign-wrapper"><i class="material-icons">timelapse</i><span style="padding-left:1em;">'+response["duration"]+' Minutes</span></div>\
                 </div>\
                 <div class="row">\
                 <div class="col s12 valign-wrapper"><i class="material-icons">event_note</i><span style="padding-left:1em;">'+response["agenda"]+'</span></div>\
@@ -108,6 +109,57 @@
         }
       },
     });
+
+    $("#add_resource_id").click(function(){
+      Save_Meeting_Resource();
+    });
+
+    function Save_Meeting_Resource() {
+      if($("#file_name_id").val()==""){
+        M.toast({html:"Please select a file first!"});
+        return ;
+      }
+
+      var input1 = document.getElementById("add_file_button_id");
+
+      var fd = new FormData();
+
+      fd.append('resource', input1.files[0]);
+      fd.append('name', $('#file_name_id').val());
+      fd.append('meeting_uuid', get_uuid() );
+
+      $.ajax({
+          url: '/Resource_Submit/',
+          data: fd,
+          processData: false,
+          contentType: false,
+          type: 'POST',
+          success: function(response){
+            console.log(response);
+            Get_Meeting_Resources();
+          },
+          error: function(xhr, a, b){
+            console.log("Some error!");
+          }
+        });
+    }
+
+    function Get_Meeting_Resources(){
+      $.ajax({
+          url: "/Get_Meeting_Resources/",
+          type: "POST",
+          data: {
+            'meeting_uuid' : get_uuid(),
+          },
+          success: function(response) {
+            console.log(response);
+            if(response['status']==200){
+              break;
+            }
+          },
+        });
+    }
+  });
 
 </script>
 

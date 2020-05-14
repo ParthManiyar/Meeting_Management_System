@@ -102,7 +102,11 @@
                     <div class="card-content " style="padding-left:2em;padding-bottom:0px;">\
                       <div class="row"><div class="col s4 valign-wrapper"><i class="material-icons ">access_time</i><span style="padding-left:1em;">'+response['past_meets'][i]["start_time"]+' </span> - <span>'+response['past_meets'][i]["end_time"]+'</span></div>\
                       <div class="col s4 valign-wrapper"><i class="material-icons">place</i> <span style="padding-left:1em;">'+response['past_meets'][i]["venue"]+'</span></div>\
-                      <div class="col s4 valign-wrapper"><i class="material-icons">event_note</i> <span style="padding-left:1em;">'+response['past_meets'][i]["agenda"]+'</span></div></div>\
+                      <div class="col s4 valign-wrapper"><i class="material-icons">date_range</i> <span style="padding-left:1em;">'+response['past_meets'][i]["meeting_date"]+'</span></div>\
+                    </div>\
+                    <div class="row">\
+                      <div class="col s12 valign-wrapper"><i class="material-icons">event_note</i> <span style="padding-left:1em;">'+response['past_meets'][i]["agenda"]+'</span></div>\
+                    </div>\
                     </div>\
                     <div class="card-action">\
                       <a href="/meetings/'+response['past_meets'][i]["uuid"]+'" class="waves-effect waves-light btn"><i class="material-icons left">search</i>View</a>\
@@ -122,10 +126,14 @@
                     <div class="card-content " style="padding-left:2em;padding-bottom:0px;">\
                       <div class="row"><div class="col s4 valign-wrapper"><i class="material-icons ">access_time</i><span style="padding-left:1em;">'+response['ongoing_meets'][i]["start_time"]+' </span> - <span>'+response['ongoing_meets'][i]["end_time"]+'</span></div>\
                       <div class="col s4 valign-wrapper"><i class="material-icons">place</i> <span style="padding-left:1em;">'+response['ongoing_meets'][i]["venue"]+'</span></div>\
-                      <div class="col s4 valign-wrapper"><i class="material-icons">event_note</i> <span style="padding-left:1em;">'+response['ongoing_meets'][i]["agenda"]+'</span></div></div>\
+                      <div class="col s4 valign-wrapper"><i class="material-icons">date_range</i> <span style="padding-left:1em;">'+response['onging_meets'][i]["meeting_date"]+'</span></div>\
+                    </div>\
+                    <div class="row">\
+                      <div class="col s12 valign-wrapper"><i class="material-icons">event_note</i> <span style="padding-left:1em;">'+response['onging_meets'][i]["agenda"]+'</span></div>\
+                    </div>\
                     </div>\
                     <div class="card-action">\
-                      <a href="/meetings/'+response['ongoing_meets'][i]["uuid"]+'" class="waves-effect waves-light btn"><i class="material-icons left">search</i>View</a>\
+                      <a href="/meetings/'+response['onging_meets'][i]["uuid"]+'" class="waves-effect waves-light btn"><i class="material-icons left">search</i>View</a>\
                     </div>\
                   </div>\
                 </div>';
@@ -142,7 +150,11 @@
                     <div class="card-content " style="padding-left:2em;padding-bottom:0px;">\
                       <div class="row"><div class="col s4 valign-wrapper"><i class="material-icons ">access_time</i><span style="padding-left:1em;">'+response['upcoming_meets'][i]["start_time"]+' </span> - <span>'+response['upcoming_meets'][i]["end_time"]+'</span></div>\
                       <div class="col s4 valign-wrapper"><i class="material-icons">place</i> <span style="padding-left:1em;">'+response['upcoming_meets'][i]["venue"]+'</span></div>\
-                      <div class="col s4 valign-wrapper"><i class="material-icons">event_note</i> <span style="padding-left:1em;">'+response['upcoming_meets'][i]["agenda"]+'</span></div></div>\
+                      <div class="col s4 valign-wrapper"><i class="material-icons">date_range</i> <span style="padding-left:1em;">'+response['upcoming_meets'][i]["meeting_date"]+'</span></div>\
+                    </div>\
+                    <div class="row">\
+                      <div class="col s12 valign-wrapper"><i class="material-icons">event_note</i> <span style="padding-left:1em;">'+response['upcoming_meets'][i]["agenda"]+'</span></div>\
+                    </div>\
                     </div>\
                     <div class="card-action">\
                       <a href="/meetings/'+response['upcoming_meets'][i]["uuid"]+'" class="waves-effect waves-light btn"><i class="material-icons left">search</i>View</a>\
