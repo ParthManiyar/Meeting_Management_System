@@ -35,6 +35,19 @@
     <br>
 
     <div class="row">
+      <div class="input-field col s3 offset-s1">
+        <i class="material-icons prefix">timelapse</i>
+        <input class="validate" id="meeting_duration_id" type="text" style="color:white">
+        <label for="meeting_duration_id">Duration (Minutes)</label>
+      </div>
+      <div class="col s4" style="padding-top:1.5em;">
+        <a class="waves-effect waves-light btn" id="common_time_slot_id">Get Common Time Slots</a>
+      </div>
+    </div>
+
+
+
+    <div class="row">
       <div class="col s2 offset-s3">
           <input placeholder="From" type="text" class="timepicker" id="meeting_from_time_id" style="color:white">
       </div>
@@ -52,6 +65,8 @@
 <script>
 
 $(document).ready(function(){
+
+  var group_uuid = "";
 
   month_dict = {
     'Jan':1,
@@ -278,11 +293,16 @@ $( "#meeting_from_time_id" ).keydown(false);
       $.ajax({
                url: "/Get_Meeting_Details/",
                type: "POST",
+               async : false,
                data: {
                   'meeting_uuid' : get_uuid(),
                },
                success: function(response) {
+                 console.log("GET MEETING DETAILS",response);
                  if(response['status']==200){
+
+                   group_uuid = response['group_uuid']
+
                    $("#meeting_name_id").val(response['name']);
                    $("#meeting_agenda_id").val(response['agenda']);
                    $("#meeting_venue_id").val(response['venue']);
@@ -304,6 +324,53 @@ $( "#meeting_from_time_id" ).keydown(false);
                  }
                },
              });
+    }
+    else{
+      group_uuid = get_uuid();
+    }
+
+    $("#common_time_slot_id").click(function () {
+      Get_Free_Time_Slots();
+    });
+
+    function Get_Free_Time_Slots(){
+
+      if($("#meeting_date_id").val() == ""){
+         M.toast({html: 'Meeting date is required!'});
+         return;
+      }
+
+      if($("#meeting_duration_id").val() == ""){
+         M.toast({html: 'Duration is required!'});
+         return;
+      }
+
+      var instance = M.Datepicker.getInstance(meeting_date_id);
+      var ins_string = instance.toString();
+
+      if(ins_string == "")
+         ins_string = $("#meeting_date_id").val()
+
+      var day = get_day(ins_string);
+      var month = get_month(ins_string);
+      var year = get_year(ins_string);
+
+
+      $.ajax({
+           url: "/Get_Free_Time_Slots/",
+           type: "POST",
+           data: {
+              'group_uuid' : group_uuid,
+              'day':day,
+              'month' :month,
+              'year':year,
+              'duration': $("#meeting_duration_id").val(),
+              'delta':"30",
+           },
+           success: function(response) {
+             console.log(response);
+           },
+         });
     }
 
 });
