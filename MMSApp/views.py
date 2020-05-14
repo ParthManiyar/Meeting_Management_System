@@ -557,6 +557,16 @@ class Create_Meeting_SubmitAPI(APIView):
             # resources
 
             m1.save()
+
+            group = m1.group
+
+            for user in group.members.all():
+                try:
+                    n1 = Notification.objects.get(user=user,meeting=m1)
+                except:
+                    n1 = Notification(user=user,meeting=m1)
+                    n1.save()
+
             response['meeting_uuid'] = m1.uuid
             print(m1.start_time)
 
@@ -642,8 +652,17 @@ class Edit_Meeting_SubmitAPI(APIView):
             m1.duration    = int(data['duration'])
             m1.venue       = data['venue']
             # resources
-
             m1.save()
+
+            group = m1.group
+
+            for user in group.members.all():
+                try:
+                    n1 = Notification.objects.get(user=user,meeting=m1)
+                except:
+                    n1 = Notification(user=user,meeting=m1)
+                    n1.save()
+
             response['meeting_uuid'] = m1.uuid
             response['name'] = m1.name
             print(m1.start_time)
@@ -1102,4 +1121,70 @@ class Get_Meeting_ResourcesAPI(APIView):
 
 Get_Meeting_Resources = Get_Meeting_ResourcesAPI.as_view()
 
+class Get_NotificationsAPI(APIView):
 
+    authentication_classes = (CsrfExemptSessionAuthentication,BasicAuthentication)
+
+    def post(self, request, *args, **kwargs):
+        response = {}
+        response["status"] = 500
+
+        try:
+            data = request.data
+            user = request.user
+            user = CustomUser.objects.get(username = user.username)
+
+            notifications = Notification.objects.filter(user=user)
+
+            response['notifs'] = []
+
+            for notif in notifications:
+                temp = {}
+                temp['meeting_name'] = notif.meeting.name
+                temp['meeting_uuid'] = notif.meeting.uuid
+                response['notifs'].append(temp)
+            
+            response['status'] = 200
+
+        except Exception as e:
+            error()
+            print("ERROR IN  = Get_Meeting_ResourcesAPI", str(e))
+
+        return Response(data=response)
+
+Get_Notifications = Get_NotificationsAPI.as_view()
+
+class Submit_NotificationAPI(APIView):
+
+    authentication_classes = (CsrfExemptSessionAuthentication,BasicAuthentication)
+
+    def post(self, request, *args, **kwargs):
+        response = {}
+        response["status"] = 500
+
+        try:
+            data = request.data
+            user = request.user
+            user = CustomUser.objects.get(username = user.username)
+
+            meeting_uuid = data['meeting_uuid']
+            choice = data['choice']
+            try:
+                meeting = Meeting.objects.get(uuid = meeting_uuid)
+                notif = Notification.objects.get(user=user,meeting=meeting)
+
+                if choice == "Yes":
+                    meeting.attendees.add(user)
+                    meeting.save()
+                
+                notif.delete()
+                response['status'] = 200
+            except Exception as e:
+                print(str(e))
+        except Exception as e:
+            error()
+            print("ERROR IN  = Get_Meeting_ResourcesAPI", str(e))
+
+        return Response(data=response)
+
+Submit_Notification = Submit_NotificationAPI.as_view()

@@ -86,45 +86,69 @@
     function get_notifications(){
       $("#notification-popup").empty();
 
-      var notifications_length = 2;
+      $.ajax({
+          url: '/Get_Notifications/',
+          data: "",
+          type: 'POST',
+          success: function(response){
+            console.log(response);
+            if(response['status']==200){
+              var notifications_length = response['notifs'].length;
 
-      $("#badge_id").text(notifications_length);
-      if(notifications_length == 0){
-        $("#badge_id").hide();
-      }
+              $("#badge_id").text(notifications_length);
+              if(notifications_length == 0){
+                $("#badge_id").hide();
+              }
 
-      for (var i=0;i<notifications_length;i++){
+              for (var i=0;i<notifications_length;i++){
 
-      var meeting_name = "XYZ";
-      var meeting_uuid = "ABC";
-      var meeting_link = "/asdasd";
+                var meeting_name = response['notifs'][i]['meeting_name'];
+                var meeting_uuid = response['notifs'][i]['meeting_uuid'];
+                var meeting_link = "/meetings/"+response['notifs'][i]['meeting_uuid'];
 
-      var temp = ' <div class="notification-element">\
-            <span>Attending Meeting <a href="'+meeting_link+'">'+meeting_name+'</a></span>\
-            <button class="waves-effect waves-light btn small-notification-button"  meeting_uuid="'+meeting_uuid+'"><span>Yes</span></button>\
-            <button class="waves-effect waves-light btn grey small-notification-button" meeting_uuid="'+meeting_uuid+'">No</button>\
-          </div>\
-          <hr style="margin:0px">';
+                var temp = ' <div class="notification-element">\
+                      <span>Attending Meeting <a href="'+meeting_link+'">'+meeting_name+'</a></span>\
+                      <button class="waves-effect waves-light btn small-notification-button"  meeting_uuid="'+meeting_uuid+'"><span>Yes</span></button>\
+                      <button class="waves-effect waves-light btn grey small-notification-button" meeting_uuid="'+meeting_uuid+'">No</button>\
+                    </div>\
+                    <hr style="margin:0px">';
 
-        $("#notification-popup").append(temp);
-      }
+                  $("#notification-popup").append(temp);
+              }
+            }
+          },
+          error: function(xhr, a, b){
+            console.log("Some error!");
+          }
+        });
 
     }
+
     $(document).on("click", ".small-notification-button", function(){
 
       var meeting_uuid = $(this).attr("meeting_uuid");
+      var choice = $(this).text();
 
-      console.log($(this).attr("meeting_uuid"));
-
-      if($(this).text() == "Yes"){
-        // MARK YES
-      }
-      else if($(this).text() == "No"){
-        // MARK NO
-      }
-      // DELETE THAT NOTIFICATION HERE
-      // !!!!!!!!!!!!!!!!!!!!!!!!!!!
-      get_notifications();
+      console.log(meeting_uuid,choice);
+      $.ajax({
+          url: '/Submit_Notification/',
+          data:{
+            'meeting_uuid':meeting_uuid.toString(),
+            'choice':choice.toString(),
+          } ,
+          type: 'POST',
+          success: function(response){
+            console.log(response);
+            if(response['status']==200){
+              get_notifications();
+            }
+          },
+          error: function(xhr, a, b){
+            console.log("Some error!");
+          }
+        });
+      
+      // get_notifications();
     });
 
     $("#back_id").click(function (){

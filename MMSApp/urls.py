@@ -39,4 +39,7 @@ urlpatterns = [
     path('schedule/',views.Get_Schedule),
     path('Get_Monthly_Schedule/',views.Get_Monthly_Schedule),
     path('Edit_Schedule_Submit/',views.Edit_Schedule_Submit),
+    # notifications
+    path('Get_Notifications/',views.Get_Notifications),
+    path('Submit_Notification/',views.Submit_Notification),
 ]

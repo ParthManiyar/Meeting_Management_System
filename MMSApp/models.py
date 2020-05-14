@@ -208,8 +208,8 @@ class Notification(models.Model):
 
     title        = models.CharField(max_length=200)
     content      = models.CharField(max_length=300)
-    isRead       = models.BooleanField(default = False)
-    target_users = models.ManyToManyField(CustomUser,related_name="notif")
+    meeting      = models.ForeignKey(Meeting,on_delete=models.CASCADE,null=True,blank=True)
+    user         = models.ForeignKey(CustomUser,on_delete=models.CASCADE,null=True,blank=True)
     uuid = models.CharField(max_length=100,default="", editable=False)
 
     def __str__(self):
