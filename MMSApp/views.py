@@ -1013,6 +1013,7 @@ class Resource_SubmitAPI(APIView):
 
             if user in group.admins.all():
                 r = Resource(owner=user,rfile=resource,name=name)
+                r.save()
                 meeting.resources.add(r)
                 response['status'] = 200
                 response['file_owner'] = user.username
@@ -1049,7 +1050,7 @@ class Resource_DeleteAPI(APIView):
             meeting = Meeting.objects.get(uuid = meeting_uuid)
             group = meeting.group
 
-            if user in group.admins:
+            if user in group.admins.all():
                 r = Resource.objects.get(uuid=r_uuid)
                 r.delete()
                 response['status'] = 200
@@ -1079,15 +1080,18 @@ class Get_Meeting_ResourcesAPI(APIView):
 
             meeting_uuid = data['meeting_uuid']
             meeting = Meeting.objects.get(uuid = meeting_uuid)
-
-            if user in meeting.group.members.all():
+            
+            if user in list(meeting.group.members.all()):
                 response['resources'] = []
-                resources = meeting.resources
+                # print("here")
+                resources = list(meeting.resources.all())
                 for r in resources:
                     temp = {}
-                    temp['file_owner'] = user.username
+                    temp['owner'] = r.owner.username
+                    temp['owner_uuid'] = r.owner.uuid
                     temp['file_path'] = settings.MEDIA_URL+r.rfile.name
                     temp['file_name'] = r.name
+                    temp['file_uuid'] = r.uuid
                     response['resources'].append(temp)
                 response['status'] = 200
         except Exception as e:
@@ -1097,3 +1101,5 @@ class Get_Meeting_ResourcesAPI(APIView):
         return Response(data=response)
 
 Get_Meeting_Resources = Get_Meeting_ResourcesAPI.as_view()
+
+

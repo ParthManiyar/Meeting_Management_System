@@ -51,7 +51,7 @@
     </div>
   <div class="fancyScroll" id="append_resources_here_id" style="max-height:400px;overflow-y:auto">
       <div class="row meeting-box" style="width:98%;">
-        <div class="col s5">
+        <div class="col s4">
           <span>File Name</span>
         </div>
         <div class="col s4">
@@ -69,14 +69,15 @@
 
 <script type="text/javascript">
 
+
 $(document).ready(function(){
 
-  function get_uuid(){
-    uuid = window.location.pathname;
-    uuid = uuid.split("/")[2];
-    return uuid;
-  }
 
+function get_uuid(){
+  uuid = window.location.pathname;
+  uuid = uuid.split("/")[2];
+  return uuid;
+}
   $("#edit_meeting_button_id").attr("href","/edit/meeting/"+get_uuid());
 
   $.ajax({
@@ -150,23 +151,44 @@ $(document).ready(function(){
     }
 
     function Get_Meeting_Resources(){
-      // $.ajax({
-      //     url: "/Get_Meeting_Resources/",
-      //     type: "POST",
-      //     data: {
-      //       'meeting_uuid' : get_uuid(),
-      //     },
-      //     success: function(response) {
-      //       console.log(response);
-      //       if(response['status']==200){
-      //         $("#append_resources_here_id").children().empty();
-
-      //         $('#append_resources_here_id').children().append(temp);
-      //       }
-      //     },
-      //   });
+      console.log("came");
+      $.ajax({
+          url: "/Get_Meeting_Resources/",
+          type: "POST",
+          data: {
+            'meeting_uuid' : get_uuid(),
+          },
+          success: function(response) {
+            console.log(response);
+            if(response['status']==200){
+              $("#append_resources_here_id").children().empty();
+              // temp['owner'] = user.username
+              //       temp['owner_uuid'] = user.uuid
+              //       temp['file_path'] = settings.MEDIA_URL+r.rfile.name
+                    // temp['file_name'] = r.name
+              for(let i=0;i<response['resources'].length;i++){
+                temp = '<div class="col s4">\
+                        <span>'+response['resources'][i]['file_name']+'</span>\
+                      </div>\
+                      <div class="col s4">\
+                        <a href="/profile/'+response['resources'][i]['owner_uuid']+'">\
+                        <i class="material-icons left white-text">add</i>'+response['resources'][i]['owner']+'</a>\
+                      </div>\
+                      <div class="col s3">\
+                      <a href="'+response['resources'][i]['file_path']+'">\
+                        <i class="material-icons left white-text">file_download</i>View/Download</a>\
+                      </div>\
+                      <div class="col s1">\
+                      <a href="#" onclick="delete_resource(\''+response['resources'][i]['file_uuid']+'\')">\
+                        <i class="material-icons left white-text delete-button">delete</i></a>\
+                      </div><br><br>';
+                $('#append_resources_here_id').children().append(temp);
+              }
+            }
+          },
+        });
     }
-
+    Get_Meeting_Resources();
     // $.ajax({
     //     url: '/GET_ATTENDEES/',
     //     data: {
@@ -203,8 +225,31 @@ $(document).ready(function(){
       //     }
       //   });
     });
-
+  function delete_resource(resource_id){
+    console.log(resource_id);
+    $.ajax({
+          url: "/Resource_Delete/",
+          type: "POST",
+          data: {
+            'meeting_uuid' : get_uuid(),
+            'r_uuid':resource_id,
+          },
+          success: function(response) {
+            if(response['status']==200){
+              M.toast({html:"File Deleted!"});
+              Get_Meeting_Resources();
+            }
+            else if(response['status']==400){
+              M.toast({html:"You cannot delete!"});
+            }
+            else{
+              M.toast({html:"Some Error occurred!"});
+            }
+          },
+        });
+  }
   });
+
 
 </script>
 
