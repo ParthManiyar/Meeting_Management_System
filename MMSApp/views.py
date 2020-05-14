@@ -826,9 +826,12 @@ def save_event(user,data,isFirst,old_start_time=0,old_end_time=0,old_name=""):
 
         ds = DailySchedule.objects.get(uuid=ds_uuid)
 
-    start_time = datetime(ds_year,ds_month,ds_day,int(event['s_hour'],int(event['s_min'])))
-    end_time = datetime(ds_year,ds_month,ds_day,int(event['s_hour'],int(event['s_min'])))
+    # print(event['s_hour'])
 
+    start_time = datetime(ds_year,ds_month,ds_day,int(event['s_hour'],int(event['s_min'])))
+    end_time = datetime(ds_year,ds_month,ds_day,int(event['e_hour']),int(event['e_min']))
+    # end_time = start_time+timedelta(hours=1)
+    print(start_time,end_time)
     if(event['is_deleted']):
         if isFirst:
             try:
@@ -860,30 +863,33 @@ def save_event(user,data,isFirst,old_start_time=0,old_end_time=0,old_name=""):
                 except:
                     error()
                     return response
+            # print("herer")
         else:
             e = Event()
             e.start_time = start_time
             e.end_time = end_time
             e.venue = event['venue']
             e.name = event['name']
-
+            e.description = event['description']
         if isFirst:
             old_start_time = e.start_time
             old_end_time = e.end_time
             old_name = e.name
 
         if isFirst:
-            clash = ds.events.all().filter(start_time__lt=end_time)
-            clash = clash.filter(end_time__lte=end_time)
-            clash = clash.filter(end_time__gt=start_time).exclude(uuid=e.uuid)
+            clash = ds.events.all().filter(start_time__lt=end_time).exclude(uuid=e.uuid)
+            # print(clash)
+            clash = clash.exclude(end_time__lte=start_time)
+            # print(clash)
         else:
-            clash = ds.events.all().filter(start_time__lt=old_end_time)
-            clash = clash.filter(end_time__lte=old_end_time)
-            clash = clash.filter(end_time__gt=old_start_time).exclude(uuid=e.uuid)
+            clash = ds.events.all().filter(start_time__lt=old_end_time).exclude(uuid=e.uuid)
+            clash = clash.exclude(end_time__lte=old_start_time)
 
+        # print("here")
         response['clash'] = []
 
         if(len(clash)>0):
+            response['status'] = 409
             for event in clash:
                 response['clash'].append(event.name)
             return response,0,0,0
