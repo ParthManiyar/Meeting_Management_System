@@ -26,10 +26,10 @@
 
 <div id="info_tab_id">
   <div class="fancyScroll" style="max-height:500px;overflow-y:auto">
-    <p><span class="grey-text">Group:</span> XYZ </p>
-    <p><span class="grey-text">Date:</span> XYZ </p>
-    <p><span class="grey-text">Start time:</span> XYZ  </p>
-    <p><span class="grey-text">End time:</span>  XYZ</p>
+    <!-- <p><span class="grey-text">Group:</span> <span id="group_name_id">XYZ</span> </p>
+    <p><span class="grey-text">Date:</span> <span id="group_date_id">XYZ</span> </p>
+    <p><span class="grey-text">Start time:</span> <span id="group_start_time_id">XYZ</span>  </p>
+    <p><span class="grey-text">End time:</span>  <span id="group_end_time_id">XYZ</span></p> -->
   </div>
 </div>
 <div id="attendees_tab_id">
@@ -74,6 +74,40 @@
   }
 
   $("#edit_meeting_button_id").attr("href","/edit/meeting/"+get_uuid());
+
+  $.ajax({
+      url: "/Get_Meeting_Details/",
+      type: "POST",
+      data: {
+        'meeting_uuid' : get_uuid(),
+      },
+      success: function(response) {
+        console.log(response);
+        if(response['status']==200){
+        var temp  = '<div class="card horizontal">\
+            <div class="card-stacked meeting-box">\
+              <div class="row zero-margin">\
+              <h5 style="padding-left:1em;text-decoration:underline;">'+response["name"]+'</h5>\
+             </div>\
+              <div class="card-content " style="padding-left:2em;padding-bottom:0px;">\
+                <div class="row">\
+                <div class="col s4 valign-wrapper"><i class="material-icons ">access_time</i><span style="padding-left:1em;">'+response["start_time_str"]+' </span> - <span>'+response["end_time_str"]+'</span></div>\
+                <div class="col s4 valign-wrapper"><i class="material-icons">place</i> <span style="padding-left:1em;">'+response["venue"]+'</span></div>\
+                <div class="col s4 valign-wrapper"><i class="material-icons">date_range</i> <span style="padding-left:1em;">'+response["meeting_date_str"]+'</span></div>\
+              </div>\
+                <div class="row">\
+                <div class="col s4 valign-wrapper"><i class="material-icons">timelapse</i><span style="padding-left:1em;">'+response["duration"]+'</span></div>\
+                </div>\
+                <div class="row">\
+                <div class="col s12 valign-wrapper"><i class="material-icons">event_note</i><span style="padding-left:1em;">'+response["agenda"]+'</span></div>\
+                </div>\
+              </div>\
+            </div>\
+          </div>';
+          $("#info_tab_id").children().append(temp);
+        }
+      },
+    });
 
 </script>
 

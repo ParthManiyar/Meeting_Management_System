@@ -293,7 +293,7 @@ function Get_Monthly_Schedule(){
 
       $('#event_name_id_'+cnt+'').val(response_schedule['schedule'][query_day]['events'][cnt]['name']);
       $('#event_venue_id_'+cnt+'').val(response_schedule['schedule'][query_day]['events'][cnt]['venue']);
-      $('#event_desc_id_'+cnt+'').val(response_schedule['schedule'][query_day]['events'][cnt]['desc']);
+      $('#event_desc_id_'+cnt+'').val(response_schedule['schedule'][query_day]['events'][cnt]['description']);
       $('#event_start_time_id_'+cnt+'').val(response_schedule['schedule'][query_day]['events'][cnt]['start_time']);
       $('#event_end_time_id_'+cnt+'').val(response_schedule['schedule'][query_day]['events'][cnt]['end_time']);
 
@@ -325,6 +325,11 @@ function Get_Monthly_Schedule(){
     function get_time_m(x) {
      var  m = parseInt(x[3]*10+ parseInt(x[4]));
       return m.toString();
+    }
+
+    function fetch_again(){
+      Get_Monthly_Schedule();
+      $("[day="+day+"]")[0].click();
     }
 
 
@@ -360,6 +365,7 @@ function Get_Monthly_Schedule(){
 
              if(response['status']==200){
                 M.toast({html: 'Saved successfully'});
+                fetch_again();
              }
              else if(response['status']==409){
                 M.toast({html: 'Conflicting!'});
@@ -419,9 +425,10 @@ function Get_Monthly_Schedule(){
 
              if(response['status']==200){
                 M.toast({html: 'Created successfully'});
+                fetch_again();
              }
              else if(response['status']==409){
-                M.toast({html: 'Conflicting!'});
+                M.toast({html: 'Conflicting time!'});
              }
              else
                M.toast({html: 'Some error occurred'});
@@ -465,6 +472,7 @@ function Get_Monthly_Schedule(){
 
              if(response['status']==200){
                 M.toast({html: 'Deleted successfully'});
+                fetch_again();
              }
              else if(response['status']==409){
                 M.toast({html: 'Conflicting!'});

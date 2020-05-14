@@ -970,7 +970,9 @@ class Get_User_MeetingsAPI(APIView):
                 temp['start_time'] = meet.get_start_time()
                 temp['end_time'] = meet.get_end_time()
                 response['upcoming_meets'].append(temp)
-            
+
+            response["status"] = 200
+
         except Exception as e:
             error()
             print("ERROR IN  = Edit_Schedule_SubmitAPI", str(e))
