@@ -10,7 +10,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 
 from django.contrib.auth.models import User
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect,HttpResponseNotFound
 
 import json
 import uuid
@@ -66,8 +66,9 @@ def Logout(request):
 
 @login_required(login_url='/login/')
 def Profile(request,username):
-    return render(request,'MMSApp/profile.html')
-
+    if len(CustomUser.objects.filter(username=username))>0:
+        return render(request,'MMSApp/profile.html')
+    return HttpResponseNotFound('<h1>Page not found</h1>') 
 # Group
 
 @login_required(login_url='/login/')
@@ -76,25 +77,35 @@ def Create_Group(request):
 
 @login_required(login_url='/login/')
 def Edit_Group(request, group_uuid):
-    return render(request,'MMSApp/group_cu.html')
-
+    if len(Group.objects.filter(uuid=group_uuid))>0:
+        return render(request,'MMSApp/group_cu.html')
+    return HttpResponseNotFound('<h1>Page not found</h1>') 
+    
 @login_required(login_url='/login/')
 def Single_Group(request, group_uuid):
-    return render(request,'MMSApp/group_rd.html')
-
+    if len(Group.objects.filter(uuid=group_uuid))>0:
+        return render(request,'MMSApp/group_rd.html')
+    return HttpResponseNotFound('<h1>Page not found</h1>') 
 # Meeting
 
 @login_required(login_url='/login/')
 def Create_Meeting(request,group_uuid):
-    return render(request,'MMSApp/meeting_cu.html')
+    if len(Group.objects.filter(uuid=group_uuid))>0:
+        return render(request,'MMSApp/meeting_cu.html')
+    return HttpResponseNotFound('<h1>Page not found</h1>') 
 
 @login_required(login_url='/login/')
 def Edit_Meeting(request,meeting_uuid):
-    return render(request,'MMSApp/meeting_cu.html')
+    if len(Meeting.objects.filter(uuid=meeting_uuid))>0:
+        return render(request,'MMSApp/meeting_cu.html')
+    return HttpResponseNotFound('<h1>Page not found</h1>') 
+
 
 @login_required(login_url='/login/')
 def Single_Meeting(request,meeting_uuid):
-    return render(request,'MMSApp/meeting_rd.html')
+    if len(Meeting.objects.filter(uuid=meeting_uuid))>0:
+        return render(request,'MMSApp/meeting_rd.html')
+    return HttpResponseNotFound('<h1>Page not found</h1>') 
 
 # Schedule
 
@@ -644,6 +655,18 @@ class Edit_Meeting_SubmitAPI(APIView):
 
             m1 = Meeting.objects.get(uuid = str(data['meeting_uuid']))
 
+            group = m1.group
+            
+            for user in group.members.all():
+                if user.schedule != None:
+                    try:
+                        schedule = user.schedule
+                        ds = schedule.daily_schedules.all().get(date=m1.meeting_date)
+                        e = ds.events.all().get(name=m1.name,start_time=m1.start_time,end_time=m1.end_time)
+                        e.delete()
+                    except:
+                        pass
+
             m1.name        = data['name']
             m1.agenda      = data['agenda']
             m1.start_time  = datetime(int(data['year']),int(data['month']),int(data['day']),int(data['s_hour']),int(data['s_min']))
@@ -653,8 +676,6 @@ class Edit_Meeting_SubmitAPI(APIView):
             m1.venue       = data['venue']
             # resources
             m1.save()
-
-            group = m1.group
 
             for user in group.members.all():
                 try:
@@ -675,6 +696,52 @@ class Edit_Meeting_SubmitAPI(APIView):
         return Response(data=response)
 
 Edit_Meeting_Submit = Edit_Meeting_SubmitAPI.as_view()
+
+class Delete_MeetingAPI(APIView):
+
+    authentication_classes = (CsrfExemptSessionAuthentication,BasicAuthentication)
+
+    def post(self, request, *args, **kwargs):
+        response = {}
+        response["status"] = 500
+
+        try:
+            data = request.data
+            user = request.user
+
+            user = CustomUser.objects.get(username = user.username)
+
+            m1 = Meeting.objects.get(uuid = str(data['meeting_uuid']))
+
+            group = m1.group
+            
+            for user in group.members.all():
+                if user.schedule != None:
+                    try:
+                        schedule = user.schedule
+                        ds = schedule.daily_schedules.all().get(date=m1.meeting_date)
+                        e = ds.events.all().get(name=m1.name,start_time=m1.start_time,end_time=m1.end_time)
+                        e.delete()
+                    except:
+                        pass
+
+            for user in group.members.all():
+                try:
+                    n1 = Notification.objects.get(user=user,meeting=m1)
+                    n1.delete()
+                except:
+                    pass
+
+            m1.delete()
+            response['group_uuid'] = group.uuid
+            response['status']=200
+        except Exception as e:
+            error()
+            print("ERROR IN  = Edit_Meeting_SubmitAPI", str(e))
+
+        return Response(data=response)
+
+Delete_Meeting = Delete_MeetingAPI.as_view()
 
 
 class Get_Monthly_ScheduleAPI(APIView):
@@ -1176,6 +1243,27 @@ class Submit_NotificationAPI(APIView):
                 if choice == "Yes":
                     meeting.attendees.add(user)
                     meeting.save()
+                    meeting_date = meeting.meeting_date
+                    
+                    if user.schedule == None:
+                        schedule = Schedule()
+                        schedule.save()
+                        user.schedule = schedule
+                        user.save()
+
+                    schedule = user.schedule
+                    try:
+                        ds = schedule.daily_schedules.all().get(date=meeting_date)
+                    except:
+                        ds = DailySchedule(date=meeting_date)
+                        ds.save()
+                        schedule.daily_schedules.add(ds)
+                        schedule.save()
+                    
+                    meeting_event = Event(name=meeting.name,start_time = meeting.start_time,end_time=meeting.end_time)
+                    meeting_event.save()
+                    ds.events.add(meeting_event)
+                    ds.save()
                 
                 notif.delete()
                 response['status'] = 200
@@ -1188,3 +1276,116 @@ class Submit_NotificationAPI(APIView):
         return Response(data=response)
 
 Submit_Notification = Submit_NotificationAPI.as_view()
+
+
+class Get_Meeting_AttendeesAPI(APIView):
+
+    authentication_classes = (CsrfExemptSessionAuthentication,BasicAuthentication)
+
+    def post(self, request, *args, **kwargs):
+        response = {}
+        response["status"] = 500
+
+        try:
+            data = request.data
+            user = request.user
+            user = CustomUser.objects.get(username = user.username)
+
+            meeting_uuid = data['meeting_uuid']
+           
+            try:
+                meeting = Meeting.objects.get(uuid=meeting_uuid)
+
+                response['attendees'] = []
+
+                for user in list(meeting.attendees.all()):
+                    temp = {}
+                    temp['user_uuid'] = user.uuid
+                    temp['user_name'] = user.username
+                    temp['is_admin'] = False
+                    
+                    if user in meeting.group.admins.all():
+                        temp['is_admin'] = True
+                    
+                    response['attendees'].append(temp)
+
+                response['status'] = 200
+            except Exception as e:
+                print(str(e))
+
+            except Exception as e:
+                print(str(e))
+        except Exception as e:
+            error()
+            print("ERROR IN  = Get_Meeting_ResourcesAPI", str(e))
+
+        return Response(data=response)
+
+Get_Meeting_Attendees = Get_Meeting_AttendeesAPI.as_view()
+
+
+class Get_User_ProfileAPI(APIView):
+
+    authentication_classes = (CsrfExemptSessionAuthentication,BasicAuthentication)
+
+    def post(self, request, *args, **kwargs):
+        response = {}
+        response["status"] = 500
+
+        try:
+            data = request.data
+            user = request.user
+            user = CustomUser.objects.get(username = data['username'])
+
+            response['username'] = user.username
+            response['email']    = user.email
+            user_groups = user.member.all()
+            response['total_groups'] = len(user_groups)
+            # print(user_groups)
+            user_meetings = Meeting.objects.filter(group__in=user_groups)
+            # print(user_meetings)
+            response['total_meetings'] = len(user_meetings)
+            response['user_dp'] = settings.MEDIA_URL+user.dp.name
+            response['status'] = 200
+        except Exception as e:
+            error()
+            print("ERROR IN  = Get_Meeting_ResourcesAPI", str(e))
+
+        return Response(data=response)
+
+Get_User_Profile = Get_User_ProfileAPI.as_view()
+
+
+class Leave_GroupAPI(APIView):
+
+    authentication_classes = (CsrfExemptSessionAuthentication,BasicAuthentication)
+
+    def post(self, request, *args, **kwargs):
+        response = {}
+        response["status"] = 500
+
+        try:
+            data = request.data
+            user = request.user
+            user = CustomUser.objects.get(username = user.username)
+
+            group_uuid = data['group_uuid']
+            group = Group.objects.get(uuid = group_uuid)
+
+            group.admins.remove(user)
+            group.members.remove(user)
+            group.save()
+
+            if(len(group.members.all())==0):
+                group.delete()
+            elif(len(group.admins.all())==0):
+                group.admins.add(group.members.first())
+
+            response['status'] = 200
+        except Exception as e:
+            error()
+            print("ERROR IN  = Get_Meeting_ResourcesAPI", str(e))
+
+        return Response(data=response)
+
+Leave_Group = Leave_GroupAPI.as_view()

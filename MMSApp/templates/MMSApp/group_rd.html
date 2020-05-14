@@ -10,7 +10,7 @@
 
     <div class="row">
       <div class="col s5">
-          <a href="#!" id="leave_group_button_id" class="waves-effect waves-light btn" ><i class="material-icons left">exit_to_app</i>Leave</a>
+          <a href="#!" id="leave_group_button_id" class="waves-effect waves-light btn"><i class="material-icons left">exit_to_app</i>Leave</a>
       </div>
       <div class="col s4">
           <a href="#!" id="edit_group_button_id" class="waves-effect waves-light btn" style="display:none" ><i class="material-icons left">create</i>Edit</a>
@@ -98,7 +98,7 @@
                   <a href="/profile/'+response['admins'][i]['username']+'">'+response['admins'][i]['username']+'</a>\
                 </div>\
                 <div class="col s3">\
-                  <span style="font-size:0.75em;">Admin</span>\
+                  <span class="right isadmin-class">Admin<span></div>\
                 </div>\
               </div><hr>';
             }
@@ -203,6 +203,28 @@
           }
         },
       });
+
+      $("#leave_group_button_id").click(function(){
+        if(confirm("Do you really want to leave the group?")){
+          $.ajax({
+          url: "/Leave_Group/",
+          type: "POST",
+          data: {
+            'group_uuid':uuid,
+          },
+          success: function(response) {
+            console.log(response);
+            if(response['status']==200){
+              M.toast({html: 'Left Group Successfully!'});
+              window.location.pathname = "/home/";
+            }  
+            else
+              M.toast({html: 'Some error occurred'});
+          },
+        });
+        }
+      }); 
+
   });
 
 </script>

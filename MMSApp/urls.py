@@ -14,6 +14,8 @@ urlpatterns = [
     # Users
     path('Get_All_Users/', views.Get_All_Users),
     path('profile/<str:username>/', views.Profile),
+    path('Get_User_Profile/',views.Get_User_Profile),
+    path('Leave_Group/',views.Leave_Group),
     # Group
     path('create/group/', views.Create_Group),
     path('edit/group/<str:group_uuid>/', views.Edit_Group),
@@ -31,6 +33,8 @@ urlpatterns = [
     path('Get_Meeting_Details/',views.Get_Meeting_Details),
     path('Edit_Meeting_Submit/',views.Edit_Meeting_Submit),
     path('Get_User_Meetings/',views.Get_User_Meetings),
+    path('Get_Attendees/',views.Get_Meeting_Attendees),
+    path('Delete_Meeting/',views.Delete_Meeting),
     # Resource
     path('Resource_Submit/',views.Resource_Submit),
     path('Resource_Delete/',views.Resource_Delete),

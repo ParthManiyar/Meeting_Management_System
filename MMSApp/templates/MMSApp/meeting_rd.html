@@ -177,23 +177,30 @@ function get_uuid(){
         });
     }
     Get_Meeting_Resources();
-    // $.ajax({
-    //     url: '/GET_ATTENDEES/',
-    //     data: {
-    //
-    //     },
-    //     type: 'POST',
-    //     success: function(response){
-    //       console.log(response);
-            // var temp = '<div class="row"><span><a href="/profile/XYZ">XYZ</a></span>\
-            // <span class="right isadmin-class">Admin<span></div>';
-            //
-            // $("#attendees_tab_id").children().append(temp);
-    //     },
-    //     error: function(xhr, a, b){
-    //       console.log("Some error!");
-    //     }
-    //   });
+    $.ajax({
+        url: '/Get_Attendees/',
+        data: {
+          'meeting_uuid':get_uuid(),
+        },
+        type: 'POST',
+        success: function(response){
+          console.log(response);
+
+          for(var i=0;i<response['attendees'].length;i++){
+            var temp = '<div class="row"><span><a href="/profile/'+response['attendees'][i]['user_uuid']+'">\
+            '+response['attendees'][i]['user_name']+'</a></span>';
+            if(response['attendees'][i]['is_admin']==true){
+              temp+='<span class="right isadmin-class">Admin<span></div>';
+            }
+      
+            $("#attendees_tab_id").children().append(temp);
+
+          }
+        },
+        error: function(xhr, a, b){
+          console.log("Some error!");
+        }
+    });
 
     $(document).on("click", ".delete-class", function(){
         delete_resource($(this).attr("r_uuid"));
@@ -222,6 +229,26 @@ function get_uuid(){
             },
           });
     }
+  $("#delete_meeting_button_id").click(function(){
+        if(confirm("Do you really want to delete the meeting?")){
+          $.ajax({
+          url: "/Delete_Meeting/",
+          type: "POST",
+          data: {
+            'meeting_uuid':get_uuid(),
+          },
+          success: function(response) {
+            console.log(response);
+            if(response['status']==200){
+              M.toast({html: 'Meeting Deleted Successfully!'});
+              window.location.pathname = "/groups/"+response['group_uuid'];
+            }  
+            else
+              M.toast({html: 'Some error occurred'});
+          },
+        });
+        }
+      });
   });
 
 

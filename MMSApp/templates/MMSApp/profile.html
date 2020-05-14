@@ -7,13 +7,13 @@
 <div class="container">
   <div class="row">
     <div class="col s3">
-      <img src="img_girl.jpg" style="height:11em;width:11em;">
+      <img id = "display_picture" src="img_girl.jpg" style="height:11em;width:11em;">
     </div>
     <div class="col s9">
-      <p><span class="grey-text">Name:</span> <span id="username_id">Akash</span></p>
-      <p><span class="grey-text">Email:</span> <span id="email_id">Akash</span></p>
-      <p><span class="grey-text">Total Meetings:</span> <span id="total_meetings_id">Akash</span></p>
-      <p><span class="grey-text">Total Groups:</span> <span id="total_groups_id">Akash</span></p>
+      <p><span class="grey-text">Name:</span> <span id="username_id"></span></p>
+      <p><span class="grey-text">Email:</span> <span id="email_id"></span></p>
+      <p><span class="grey-text">Total Meetings:</span> <span id="total_meetings_id"></span></p>
+      <p><span class="grey-text">Total Groups:</span> <span id="total_groups_id"></span></p>
     </div>
   </div>
 </div>
@@ -25,11 +25,32 @@ var email = "";
 var total_meetings = "";
 var total_groups = "";
 
-$('#username_id').text(username);
-$('#email_id').text(email);
-$('#total_meetings_id').text(total_meetings);
-$('#total_groups_id').text(total_groups);
+function get_name(){
+  name = window.location.pathname;
+  name = name.split("/")[2];
+  return name;
+}
+console.log(get_name());
+$.ajax({
+         url: "/Get_User_Profile/",
+         type: "POST",
+         data: {
+           'username':get_name(),
+         },
+         success: function(response) {
+           console.log(response);
+           if(response['status']==200){                         
+              $('#username_id').text(response['username']);
+              $('#email_id').text(response['email']);
+              $('#total_meetings_id').text(response['total_meetings']);
+              $('#total_groups_id').text(response['total_groups']);
+              $('#display_picture').attr("src", response['user_dp']);
+           }  
+           else
+             M.toast({html: 'Some error occurred'});
 
+         },
+});
 
 </script>
 
