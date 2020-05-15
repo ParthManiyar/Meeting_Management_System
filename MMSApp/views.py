@@ -554,11 +554,15 @@ class Create_Meeting_SubmitAPI(APIView):
             chatroom    = ChatRoom(name=data['name'])
             chatroom.save()
 
+            if user not in group.members.all():
+                return Response(data=response)
+
             m1 = Meeting()
 
             m1.name        = data['name']
             m1.agenda      = data['agenda']
             m1.group       = group
+            m1.owner       = user
             m1.start_time  = datetime(int(data['year']),int(data['month']),int(data['day']),int(data['s_hour']),int(data['s_min']))
             m1.end_time    = datetime(int(data['year']),int(data['month']),int(data['day']),int(data['e_hour']),int(data['e_min']))
             m1.meeting_date= date(int(data['year']),int(data['month']),int(data['day']))
@@ -716,6 +720,9 @@ class Delete_MeetingAPI(APIView):
             m1 = Meeting.objects.get(uuid = str(data['meeting_uuid']))
 
             group = m1.group
+
+            if (user not in group.admins.all()) and (user != m1.owner):
+                return Response(data=response)
 
             for user in group.members.all():
                 if user.schedule != None:
@@ -1103,7 +1110,7 @@ class Resource_SubmitAPI(APIView):
             meeting = Meeting.objects.get(uuid = meeting_uuid)
             group = meeting.group
 
-            if user in group.admins.all():
+            if (user in group.admins.all()) or (user == meeting.owner):
                 r = Resource(owner=user,rfile=resource,name=name)
                 r.save()
                 meeting.resources.add(r)
@@ -1142,7 +1149,7 @@ class Resource_DeleteAPI(APIView):
             meeting = Meeting.objects.get(uuid = meeting_uuid)
             group = meeting.group
 
-            if user in group.admins.all():
+            if user in group.admins.all() or user == meeting.owner:
                 r = Resource.objects.get(uuid=r_uuid)
                 r.delete()
                 response['status'] = 200

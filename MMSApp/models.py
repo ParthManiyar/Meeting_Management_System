@@ -174,6 +174,7 @@ class Meeting(models.Model):
     name         = models.CharField(max_length=200)
     agenda       = models.CharField(max_length=500)
     group        = models.ForeignKey(Group,on_delete=models.CASCADE)
+    owner        = models.ForeignKey(CustomUser,on_delete=models.CASCADE,blank=True,null=True)
     attendees    = models.ManyToManyField(CustomUser,related_name="attendee")
     meeting_date = models.DateField(blank=True,null=True)
     start_time   = models.DateTimeField(blank=True,null=True)

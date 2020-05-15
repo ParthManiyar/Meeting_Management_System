@@ -133,6 +133,12 @@ function get_uuid(){
             if(response['status']==200){
                 Get_Meeting_Resources();
             }
+            else if(response['status']==400){
+              M.toast({html:"You are not authorised!"});
+            }
+            else{
+              M.toast({html:"Some error occurred!"});
+            }
           },
           error: function(xhr, a, b){
             console.log("Some error!");
