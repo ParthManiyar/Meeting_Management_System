@@ -67,6 +67,21 @@
     12:'Dec',
   };
 
+  month_dict_inv = {
+    'Jan':1,
+    'Feb':2,
+    'Mar':3,
+    'Apr':4,
+    'May':5,
+    'Jun':6,
+    'Jul':7,
+    'Aug':8,
+    'Sep':9,
+    'Oct':10,
+    'Nov':11,
+    'Dec':12,
+  };
+
   var d = new Date();
   var month = d.getMonth()+1;
   var year = d.getFullYear();
@@ -111,7 +126,7 @@ function Get_Monthly_Schedule(){
 
                      if(response['schedule'][days]!=""){
                          for(var i=0;i<Math.min(max_length,response['schedule'][days]['events'].length);i++){
-                            temp += '<div class="event-component">'+response['schedule'][days]['events'][i]['name']+'</div>';
+                            temp += '<div class="event-component"><span style="font-weight:bold;">'+ response['schedule'][days]['events'][i]['start_time']+ '</span> '+response['schedule'][days]['events'][i]['name']+'</div>';
                          }
                          if(response['schedule'][days]['events'].length > max_length){
                            var dif = response['schedule'][days]['events'].length - max_length
@@ -332,10 +347,45 @@ function Get_Monthly_Schedule(){
       $("[day="+day+"]")[0].click();
     }
 
+    function get_day(x){
+      var d = parseInt(x[4]*10+parseInt(x[5]));
+      return d;
+    }
+
+    function get_year(x){
+      var d = parseInt(parseInt(x[8])*1000+parseInt(x[9])*100+parseInt(x[10])*10+parseInt(x[11]));
+      return d;
+    }
+
+    function get_month(x){
+      console.log(x);
+      y = "";
+      for (var i=0;i<x.length;i++){
+        if(x[i] == " ")
+          break;
+        y += x[i];
+      }
+      console.log(y);
+      return month_dict_inv[y].toString();
+    }
+
 
     $(document).on("click", ".event_save_class", function(){
+
       var cnt = $(this).attr("cnt");
       var uuid = response_schedule['schedule'][day]['events'][cnt]['uuid'];
+
+      if($('#event_name_id_'+cnt+'').val() == "" || $('#event_venue_id_'+cnt+'').val() == "" || $("#event_start_time_id_"+cnt).val() == "" || $("#event_end_time_id_"+cnt).val() == "" || $('#event_desc_id_'+cnt+'').val() == ""){
+        M.toast({html: 'All inputs are required!'});
+        return ;
+      }
+      if($('#event_repeat_id_'+cnt).prop("checked")){
+        if($('#event_repeat_till_time_id_'+cnt).val()==""){
+          M.toast({html: 'Repeat till date is required!'});
+          return ;
+        }
+      }
+
         temp_dict = {
           name:$('#event_name_id_'+cnt+'').val(),
           venue:$('#event_venue_id_'+cnt+'').val(),
@@ -348,6 +398,17 @@ function Get_Monthly_Schedule(){
           is_deleted:false,
           is_edited:true,
         }
+        var change_all_bool = false;
+        var till_day = "";
+        var till_year = "";
+        var till_month = "";
+        if($("#event_repeat_id_"+cnt).prop("checked")){
+          var x = $('#event_repeat_till_time_id_'+cnt).val();
+          till_day = get_day(x);
+          till_month = get_month(x);
+          till_year = get_year(x);
+          change_all_bool = true;
+        }
         var ds_uuid =  response_schedule['schedule'][day]['date_uuid'];
         $.ajax({
            url: "/Edit_Schedule_Submit/",
@@ -358,7 +419,10 @@ function Get_Monthly_Schedule(){
             'ds_month':month.toString(),
             'ds_day':day.toString(),
             'event':JSON.stringify(temp_dict),
-            'change_all':false,
+            'change_all':change_all_bool,
+            'till_year':till_year,
+            'till_month' : till_month,
+            'till_day' : till_day,
            },
            success: function(response) {
              console.log(response);
@@ -388,7 +452,7 @@ function Get_Monthly_Schedule(){
       }
       if($('#event_repeat_id_'+cnt).prop("checked")){
         if($('#event_repeat_till_time_id_'+cnt).val()==""){
-          M.toast({html: 'Repeat til date is required!'});
+          M.toast({html: 'Repeat till date is required!'});
           return ;
         }
       }
@@ -405,7 +469,17 @@ function Get_Monthly_Schedule(){
           is_deleted:false,
           is_edited:false,
         }
-        console.log(temp_dict);
+        var change_all_bool = false;
+        var till_day = "";
+        var till_year = "";
+        var till_month = "";
+        if($("#event_repeat_id_"+cnt).prop("checked")){
+          var x = $('#event_repeat_till_time_id_'+cnt).val();
+          till_day = get_day(x);
+          till_month = get_month(x);
+          till_year = get_year(x);
+          change_all_bool = true;
+        }
         ds_uuid = "";
         if(response_schedule['schedule'][day]!="")
            ds_uuid =  response_schedule['schedule'][day]['date_uuid'];
@@ -418,7 +492,10 @@ function Get_Monthly_Schedule(){
             'ds_month':month.toString(),
             'ds_day':day.toString(),
             'event':JSON.stringify(temp_dict),
-            'change_all':false,
+            'change_all':change_all_bool,
+            'till_year':till_year,
+            'till_month' : till_month,
+            'till_day' : till_day,
            },
            success: function(response) {
              console.log(response);
@@ -452,7 +529,17 @@ function Get_Monthly_Schedule(){
           is_deleted:true,
           is_edited:false,
         }
-
+        var change_all_bool = false;
+        var till_day = "";
+        var till_year = "";
+        var till_month = "";
+        if($("#event_repeat_id_"+cnt).prop("checked")){
+          var x = $('#event_repeat_till_time_id_'+cnt).val();
+          till_day = get_day(x);
+          till_month = get_month(x);
+          till_year = get_year(x);
+          change_all_bool = true;
+        }
         ds_uuid = "";
         if(response_schedule['schedule'][day]!="")
            ds_uuid =  response_schedule['schedule'][day]['date_uuid'];
@@ -465,7 +552,10 @@ function Get_Monthly_Schedule(){
             'ds_month':month.toString(),
             'ds_day':day.toString(),
             'event':JSON.stringify(temp_dict),
-            'change_all':false,
+            'change_all':change_all_bool,
+            'till_year':till_year,
+            'till_month' : till_month,
+            'till_day' : till_day,
            },
            success: function(response) {
              console.log(response);

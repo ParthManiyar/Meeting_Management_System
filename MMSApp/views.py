@@ -68,7 +68,7 @@ def Logout(request):
 def Profile(request,username):
     if len(CustomUser.objects.filter(username=username))>0:
         return render(request,'MMSApp/profile.html')
-    return HttpResponseNotFound('<h1>Page not found</h1>') 
+    return HttpResponseNotFound('<h1>Page not found</h1>')
 # Group
 
 @login_required(login_url='/login/')
@@ -79,33 +79,33 @@ def Create_Group(request):
 def Edit_Group(request, group_uuid):
     if len(Group.objects.filter(uuid=group_uuid))>0:
         return render(request,'MMSApp/group_cu.html')
-    return HttpResponseNotFound('<h1>Page not found</h1>') 
-    
+    return HttpResponseNotFound('<h1>Page not found</h1>')
+
 @login_required(login_url='/login/')
 def Single_Group(request, group_uuid):
     if len(Group.objects.filter(uuid=group_uuid))>0:
         return render(request,'MMSApp/group_rd.html')
-    return HttpResponseNotFound('<h1>Page not found</h1>') 
+    return HttpResponseNotFound('<h1>Page not found</h1>')
 # Meeting
 
 @login_required(login_url='/login/')
 def Create_Meeting(request,group_uuid):
     if len(Group.objects.filter(uuid=group_uuid))>0:
         return render(request,'MMSApp/meeting_cu.html')
-    return HttpResponseNotFound('<h1>Page not found</h1>') 
+    return HttpResponseNotFound('<h1>Page not found</h1>')
 
 @login_required(login_url='/login/')
 def Edit_Meeting(request,meeting_uuid):
     if len(Meeting.objects.filter(uuid=meeting_uuid))>0:
         return render(request,'MMSApp/meeting_cu.html')
-    return HttpResponseNotFound('<h1>Page not found</h1>') 
+    return HttpResponseNotFound('<h1>Page not found</h1>')
 
 
 @login_required(login_url='/login/')
 def Single_Meeting(request,meeting_uuid):
     if len(Meeting.objects.filter(uuid=meeting_uuid))>0:
         return render(request,'MMSApp/meeting_rd.html')
-    return HttpResponseNotFound('<h1>Page not found</h1>') 
+    return HttpResponseNotFound('<h1>Page not found</h1>')
 
 # Schedule
 
@@ -658,7 +658,7 @@ class Edit_Meeting_SubmitAPI(APIView):
             m1 = Meeting.objects.get(uuid = str(data['meeting_uuid']))
 
             group = m1.group
-            
+
             for user in group.members.all():
                 if user.schedule != None:
                     try:
@@ -716,7 +716,7 @@ class Delete_MeetingAPI(APIView):
             m1 = Meeting.objects.get(uuid = str(data['meeting_uuid']))
 
             group = m1.group
-            
+
             for user in group.members.all():
                 if user.schedule != None:
                     try:
@@ -865,19 +865,23 @@ class Edit_Schedule_SubmitAPI(APIView):
             if response['status'] == 200:
                 if (data['change_all']=="true"):
                     print(data['change_all'])
-                    till_date = datetime(data['till_year'],data['till_month'],data['till_day'])
+                    till_date = datetime(int(data['till_year']),int(data['till_month']),int(data['till_day']))
 
                     ds_day = int(data['ds_day'])
                     ds_month = int(data['ds_month'])
                     ds_year = int(data['ds_year'])
                     next_date = datetime(ds_year,ds_month,ds_day)+timedelta(days=7)
 
+                    data_temp = data.copy()
+
                     while(next_date<=till_date):
-                        data['ds_day'] = next_date.day
-                        data['ds_month'] = next_date.month
-                        data['ds_year'] = next_date.year
-                        data['ds_uuid'] = ""
-                        save_event(user,data,False,old_start,old_end,old_name)
+                        data_temp['ds_day'] = next_date.day
+                        data_temp['ds_month'] = next_date.month
+                        data_temp['ds_year'] = next_date.year
+                        data_temp['ds_uuid'] = ""
+
+                        save_event(user,data_temp,False,old_start,old_end,old_name)
+                        next_date = next_date + timedelta(days=7) 
 
         except Exception as e:
             error()
@@ -1212,7 +1216,7 @@ class Get_NotificationsAPI(APIView):
                 temp['meeting_name'] = notif.meeting.name
                 temp['meeting_uuid'] = notif.meeting.uuid
                 response['notifs'].append(temp)
-            
+
             response['status'] = 200
 
         except Exception as e:
@@ -1246,7 +1250,7 @@ class Submit_NotificationAPI(APIView):
                     meeting.attendees.add(user)
                     meeting.save()
                     meeting_date = meeting.meeting_date
-                    
+
                     if user.schedule == None:
                         schedule = Schedule()
                         schedule.save()
@@ -1261,12 +1265,12 @@ class Submit_NotificationAPI(APIView):
                         ds.save()
                         schedule.daily_schedules.add(ds)
                         schedule.save()
-                    
+
                     meeting_event = Event(name=meeting.name,start_time = meeting.start_time,end_time=meeting.end_time)
                     meeting_event.save()
                     ds.events.add(meeting_event)
                     ds.save()
-                
+
                 notif.delete()
                 response['status'] = 200
             except Exception as e:
@@ -1294,7 +1298,7 @@ class Get_Meeting_AttendeesAPI(APIView):
             user = CustomUser.objects.get(username = user.username)
 
             meeting_uuid = data['meeting_uuid']
-           
+
             try:
                 meeting = Meeting.objects.get(uuid=meeting_uuid)
 
@@ -1305,10 +1309,10 @@ class Get_Meeting_AttendeesAPI(APIView):
                     temp['user_uuid'] = user.uuid
                     temp['user_name'] = user.username
                     temp['is_admin'] = False
-                    
+
                     if user in meeting.group.admins.all():
                         temp['is_admin'] = True
-                    
+
                     response['attendees'].append(temp)
 
                 response['status'] = 200

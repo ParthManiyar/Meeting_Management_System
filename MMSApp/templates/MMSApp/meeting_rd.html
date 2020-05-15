@@ -159,7 +159,7 @@ function get_uuid(){
                         <span>'+response['resources'][i]['file_name']+'</span>\
                       </div>\
                       <div class="col s4">\
-                        <a href="/profile/'+response['resources'][i]['owner_uuid']+'">\
+                        <a href="/profile/'+response['resources'][i]['owner']+'">\
                         <i class="material-icons left white-text">add</i>'+response['resources'][i]['owner']+'</a>\
                       </div>\
                       <div class="col s3">\
@@ -192,7 +192,7 @@ function get_uuid(){
             if(response['attendees'][i]['is_admin']==true){
               temp+='<span class="right isadmin-class">Admin<span></div>';
             }
-      
+
             $("#attendees_tab_id").children().append(temp);
 
           }
@@ -242,7 +242,7 @@ function get_uuid(){
             if(response['status']==200){
               M.toast({html: 'Meeting Deleted Successfully!'});
               window.location.pathname = "/groups/"+response['group_uuid'];
-            }  
+            }
             else
               M.toast({html: 'Some error occurred'});
           },
