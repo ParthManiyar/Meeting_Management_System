@@ -531,69 +531,50 @@ Systems like Linux, Windows and Mac OS.
 
 ### A.1 Entity-Relationship Diagram
 
-```
-![Figure 1: ER Diagram](Diagram//ER Diagram/ER_final.png)
-```
+![Figure 1: ER Diagram](Diagram/ER_Diagram/ER_Final.png)
 
 ### A.2 Use-Case Diagram
 
-```
-Figure 2: Use-Case Diagram
-```
+![Figure 2: Use-Case Diagram](Diagram/Use-Case_Diagram/Use-Case_Diagram.png)
+
 
 ### A.3 Data-Flow Diagram
 
-```
-Figure 3: Data-Flow Diagram Level 0
-```
-```
-Figure 4: Data-Flow Diagram Level 1: Component Breakup : User
-```
+![Figure 3: Data-Flow Diagram Level 0](Diagram/Data_Flow_Diagram/Data_Flow_Diagram_Level_0.jpg)
 
-```
-Figure 5: Data-Flow Diagram Level 1: Component Breakup : Meeting
-```
-Figure 6: Data-Flow Diagram Level 1: Component Breakup : Schedule
+![Figure 4: Data-Flow Diagram Level 1: Component Breakup : User](Diagram/Data_Flow_Diagram/User.JPG)
 
+![Figure 5: Data-Flow Diagram Level 1: Component Breakup : Meeting](Diagram/Data_Flow_Diagram/Meeting.JPG)
 
-```
-Figure 7: Data-Flow Diagram Level 1: Component Breakup : Group
-```
+![Figure 6: Data-Flow Diagram Level 1: Component Breakup : Schedule](Diagram/Data_Flow_Diagram/Schedule.JPG)
+
+![Figure 7: Data-Flow Diagram Level 1: Component Breakup : Group](Diagram/Data_Flow_Diagram/Group.JPG)
+
 ### A.4 State Diagram
 
-```
-Figure 8: State Diagram: Component Breakup : Login
-```
+![Figure 8: State Diagram: Component Breakup : Login](Diagram/State_Diagram/Login_Page.png)
 
-Figure 9: State Diagram: Component Breakup : System Dashboard
+![Figure 9: State Diagram: Component Breakup : System Dashboard](Diagram/State_Diagram/System_Dashboard.png)
 
-```
-Figure 10: State Diagram: Component Breakup : Schedule
-```
+![Figure 10: State Diagram: Component Breakup : Schedule](Diagram/State_Diagram/Login_Page.png)
 
-Figure 11: State Diagram: Component Breakup : Meeting
+![Figure 11: State Diagram: Component Breakup : Meeting](Diagram/State_Diagram/Meeting_section.png)
 
-
-Figure 12: State Diagram: Component Breakup : Group
+![Figure 12: State Diagram: Component Breakup : Group](Diagram/State_Diagram/Schedule_section.png)
 
 
 ### A.5 Sequence Diagram
 
-```
-Figure 13: Sequence Diagram: Component Breakup : Login and Sign up
-```
+![Figure 13: Sequence Diagram: Component Breakup : Login and Sign up](Diagram/Sequence_Diagram/Login_Signup.png)
 
-Figure 14: Sequence Diagram: Component Breakup : Create Group
+![Figure 14: Sequence Diagram: Component Breakup : Create Group](Diagram/Sequence_Diagram/Group_Create.png)
 
+![Figure 15: Sequence Diagram: Component Breakup : Edit Group](Diagram/Sequence_Diagram/Group_edit.png)
 
-Figure 15: Sequence Diagram: Component Breakup : Edit Group
+![Figure 16: Sequence Diagram: Component Breakup : Create Meeting](Diagram/Sequence_Diagram/Create_Meeting.png)
 
+![Figure 17: Sequence Diagram: Component Breakup : Edit Meeting](Diagram/Sequence_Diagram/Edit_Meeeting.png)
 
-Figure 16: Sequence Diagram: Component Breakup : Create Meeting
-
-```
-Figure 17: Sequence Diagram: Component Breakup : Edit Group
-```
 
 ## B Issues List
 
