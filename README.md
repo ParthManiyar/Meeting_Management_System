@@ -573,7 +573,7 @@ Systems like Linux, Windows and Mac OS.
 
 ![Figure 16: Sequence Diagram: Component Breakup : Create Meeting](Diagram/Sequence_Diagram/Create_Meeting.png)
 
-![Figure 17: Sequence Diagram: Component Breakup : Edit Meeting](Diagram/Sequence_Diagram/Edit_Meeeting.png)
+![Figure 17: Sequence Diagram: Component Breakup : Edit Meeting](Diagram/Sequence_Diagram/Edit_Meeting.png)
 
 
 ## B Issues List
