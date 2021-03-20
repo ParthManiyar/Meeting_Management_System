@@ -532,7 +532,7 @@ Systems like Linux, Windows and Mac OS.
 ### A.1 Entity-Relationship Diagram
 
 ```
-Figure 1: ER Diagram
+![Figure 1: ER Diagram](Diagram//ER Diagram/ER_final.png)
 ```
 
 ### A.2 Use-Case Diagram
